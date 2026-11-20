@@ -61,11 +61,20 @@ button{font:inherit;color:inherit}
 .case div{display:flex;flex-direction:column;min-width:0}
 .case .k{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
 .case .v{font-size:13px;font-weight:500;white-space:nowrap}
-.top-right{margin-left:auto;display:flex;align-items:center;gap:16px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.top-right{display:flex;align-items:center;gap:16px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 .live{display:flex;align-items:center;gap:8px;letter-spacing:.12em}
 .live i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(70,211,160,.6);animation:pulse 2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(70,211,160,.55)}70%{box-shadow:0 0 0 8px rgba(70,211,160,0)}100%{box-shadow:0 0 0 0 rgba(70,211,160,0)}}
 #clock{color:var(--fg);font-variant-numeric:tabular-nums}
+
+.cases{display:flex;border:1px solid var(--line-2);margin-left:auto}
+.case-tab{background:rgba(10,19,34,.9);border:0;border-right:1px solid var(--line-2);padding:6px 16px;min-height:44px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);text-align:left;line-height:1.3;transition:background .2s,color .2s}
+.case-tab:last-child{border-right:0}
+.case-tab b{display:block;font-family:var(--f-mono);font-size:10px;font-weight:500;letter-spacing:.16em;color:var(--dim)}
+.case-tab:hover{color:var(--fg)}
+.case-tab[aria-selected="true"]{background:var(--panel-2);color:var(--fg);box-shadow:inset 0 -2px 0 var(--amber)}
+.case-tab[aria-selected="true"] b{color:var(--amber)}
+.top-right{margin-left:0}
 
 /* ---------- stage ---------- */
 .stage{display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:12px;min-height:0}
@@ -160,6 +169,7 @@ button{font:inherit;color:inherit}
 .chart-scroll{overflow-x:auto;overflow-y:hidden}
 .chart-scroll svg{display:block;width:100%;height:auto;min-width:620px}
 svg.tl{display:block;width:100%;height:auto}
+@media (min-width:981px){ .s1-grid .chart-scroll svg{min-width:0} }
 svg text{font-family:var(--f-mono)}
 .ax{fill:var(--dim);font-size:11px}
 .gridl{stroke:rgba(122,150,200,.10);stroke-width:1}
@@ -314,13 +324,17 @@ svg text{font-family:var(--f-mono)}
       </svg>
       <div>
         <div class="brand-name">SITE FORENSICS LAB</div>
-        <div class="brand-sub">현장 포렌식 랩 · 공정 지연 수사</div>
+        <div class="brand-sub" id="brandSub">현장 포렌식 랩 · 공정 지연 수사</div>
       </div>
     </div>
     <div class="case">
-      <div><span class="k">Case</span><span class="v">SFL-26-1115</span></div>
+      <div><span class="k">Case</span><span class="v" id="caseNo">SFL-26-1115-A</span></div>
       <div><span class="k">현장</span><span class="v">송도 스마트 물류센터 신축공사</span></div>
       <div><span class="k">규모</span><span class="v">B1 / 6F · 계약 486억 · 공기 40주</span></div>
+    </div>
+    <div class="cases" role="tablist" aria-label="사건 선택">
+      <button class="case-tab" type="button" role="tab" data-case="schedule" aria-selected="true"><b>CASE A</b>공정 지연</button>
+      <button class="case-tab" type="button" role="tab" data-case="cost" aria-selected="false"><b>CASE B</b>원가 초과</button>
     </div>
     <div class="top-right">
       <span class="live"><i></i>LIVE ANALYSIS</span>
@@ -945,11 +959,417 @@ const SCENES = [
     log:`현 추세 준공 ${ymd(BASE.finish)} · 만회 시뮬레이션 준비` }
 ];
 
+/* ======================== CASE B : COST DATA ======================== */
+const BEST_A = (() => { let b = null; for (let c = 0; c <= 3; c++) for (const s of [false, true]) for (const k of [false, true]) { const r = simulate(c, s, k); if (!b || r.total < b.r.total) b = { c, s, k, r }; } return b; })();
+const BAC = 452, CONTRACT = 486, TARGET = CONTRACT - BAC;        // 억 원
+const OVR_W = [0.05,0.08,0.02,0.10,0.06,0.04,0.12,0.09,0.07,0.11,0.08,0.10,0.12,1.9,2.6,2.4,1.8,1.5,1.7,1.6,1.66];
+const EVc = [0], ACc = [0], PVc = [];
+for (let w = 0; w <= TOTAL_W; w++) PVc[w] = BAC * plan(w) / 100;
+{ let acc = 0; for (let w = 1; w <= NOW_W; w++){ acc += OVR_W[w - 1]; EVc[w] = BAC * actual[w] / 100; ACc[w] = EVc[w] + acc; } }
+const EV = EVc[NOW_W], AC = ACc[NOW_W], OVER = AC - EV, CPI = EV / AC, EAC = BAC / CPI;
+const PEN_A = BASE.penalty / 10000;
+const PROFIT_BASE = CONTRACT - EAC - PEN_A;
+// 철근 (W6..W21)
+const RB_Q = [180,260,320,380,420,450,460,470,150,90,210,330,390,400,330,360];
+const RB_L = [3.1,2.8,3.4,3.0,3.3,2.9,3.2,3.6,4.1,6.0,21.5,24.8,22.1,16.4,9.8,8.6];
+const RB_W0 = 6, LOSS_PLAN = 3.0, P_PLAN = 92, P_ACT = 95.6, RB_TOTAL = 12400;   // t, 만 원/t
+const RB_DESIGN = RB_Q.reduce((s, v) => s + v, 0);
+const RB_ACTQ = RB_Q.reduce((s, q, i) => s + q * (1 + RB_L[i] / 100), 0);
+const LOSS_ACT = (RB_ACTQ / RB_DESIGN - 1) * 100;
+const RB_BUDQ = RB_DESIGN * (1 + LOSS_PLAN / 100);
+const RB_BUDGET = RB_BUDQ * P_PLAN / 10000;
+const PV_RB = (P_ACT - P_PLAN) * RB_ACTQ / 10000, QV_RB = (RB_ACTQ - RB_BUDQ) * P_PLAN / 10000, RB_VAR = PV_RB + QV_RB;
+const RB_REMAIN = RB_TOTAL - RB_DESIGN;
+const PER_LOSS_PT = RB_REMAIN * 0.01 * P_ACT / 10000;
+// 공기 연동 원가 (주별, 억)
+const DL_W = Array(NOW_W).fill(0);
+[0.9,1.4,1.3,1.1,0.9,1.0,0.95,0.95].forEach((v, i) => { DL_W[13 + i] = v; });
+const DL_TOTAL = DL_W.reduce((s, v) => s + v, 0);
+const CLAIM = DL_W[13] + DL_W[14] + DL_W[15];
+const DAILY_DL = DL_TOTAL * 10000 / DELAY, DAILY_ALL = DAILY_DL + PENALTY_PER_DAY;
+const ETC_FIXED = 0.12;
+const ITEMS = [
+  { code:"C-01", name:"재료비", share:.42, v:["crit","주범 · 철근"], note:"" },
+  { code:"C-02", name:"노무비", share:.22, var:4.6, v:["warn","공기 연동"], note:"출하 중단 기간 대기 인력 · 비생산 노무비" },
+  { code:"C-03", name:"외주비", share:.24, var:2.1, v:["warn","공기 연동"], note:"골조 외주 대기 보상 · 단가 정산" },
+  { code:"C-04", name:"장비비", share:.07, var:1.8, v:["warn","공기 연동"], note:"타워크레인 · 펌프카 임대 연장" },
+  { code:"C-05", name:"경비",   share:.05, var:ETC_FIXED, v:["ok","알리바이 확인"], note:"현장 운영비 정상 범위" }
+];
+const MAT_OTHER = OVER - RB_VAR - 4.6 - 2.1 - 1.8 - ETC_FIXED;
+ITEMS[0].var = RB_VAR + MAT_OTHER;
+ITEMS[0].note = `철근 ${RB_VAR.toFixed(1)}억 · 레미콘 외 ${MAT_OTHER.toFixed(1)}억`;
+ITEMS.forEach(it => { it.ev = EV * it.share; it.ac = it.ev + it.var; });
+const INDIRECT = 1850;   // 만 원/일 : 현장관리비 + 장비 임대 등 간접비
+const eok = (v, sign) => (sign ? (v > 0.005 ? "+" : v < -0.005 ? "−" : "") : (v < -0.005 ? "−" : "")) + Math.abs(v).toFixed(1) + "억";
+const manwon = v => Math.round(v).toLocaleString("ko-KR") + "만 원";
+const MEASURES = (() => {
+  const daysSaved = dayDiff(BEST_A.r.finish, BASE.finish);
+  return {
+    recov: { label:"공정 만회안", net: (BASE.penalty - BEST_A.r.penalty) / 10000 - BEST_A.r.cost / 10000 + daysSaved * INDIRECT / 10000,
+             detail:`지체상금 ${eok((BASE.penalty - BEST_A.r.penalty) / 10000)} · 간접비 ${daysSaved}일분 ${eok(daysSaved * INDIRECT / 10000)} 회피 − 대책비 ${eok(BEST_A.r.cost / 10000)}` },
+    factory: { label:"철근 공장가공", net: RB_REMAIN * (LOSS_ACT - 3.5) / 100 * P_ACT / 10000 - 0.8,
+             detail:`잔여 ${RB_REMAIN.toLocaleString("ko-KR")}t 로스 ${LOSS_ACT.toFixed(1)}% → 3.5% − 가공비 차액 0.8억` },
+    es: { label:"물가변동 조정", net: RB_REMAIN * (P_ACT - P_PLAN) / 10000,
+             detail:`철근 단가 +${((P_ACT / P_PLAN - 1) * 100).toFixed(1)}% · 품목조정 요건 3% 충족` },
+    claim: { label:"레미콘사 청구", net: CLAIM, detail:`귀책 구간 W14–W16 공기 연동 원가 ${eok(CLAIM)}` }
+  };
+})();
+
+/* ======================== CASE B : SCENES ======================== */
+function costOverview(){
+  body.innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><div class="k">기성 기준 원가 (EV)</div><div class="v">${EV.toFixed(1)}<small>억</small></div></div>
+      <div class="kpi"><div class="k">실투입 원가 (AC)</div><div class="v" style="color:var(--red)">${AC.toFixed(1)}<small>억</small></div></div>
+      <div class="kpi warn"><div class="k">원가 효율 CPI</div><div class="v">${CPI.toFixed(2)}</div></div>
+      <div class="kpi crit"><div class="k">준공 예상 손익</div><div class="v">${eok(PROFIT_BASE, true).replace("억", "")}<small>억</small></div></div>
+    </div>
+    <div class="s1-grid">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">획득가치 분석 EVM · 누적 원가</span>
+          <div class="legend"><span style="color:var(--muted)"><i class="sw" style="background:none;border-top:2px dashed var(--muted)"></i>계획 PV</span><span style="color:var(--cyan)"><i class="sw"></i>기성 EV</span><span style="color:var(--red)"><i class="sw"></i>실투입 AC</span></div>
+        </div>
+        <div class="chart-scroll"><svg id="c1" viewBox="0 0 640 360" role="img" aria-label="계획, 기성, 실투입 누적 원가 곡선"></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">준공 시 손익 전망</span><span class="eyebrow" style="color:var(--dim)">지체상금 포함</span></div>
+        <svg id="c1m" viewBox="0 0 320 330" style="display:block;width:100%;height:auto;max-height:360px" role="img" aria-label="목표 이익 대비 예상 손익"></svg>
+      </div>
+    </div>`;
+  const svg = $("c1"), W = 640, H = 360, L = 50, Rr = 104, T = 22, B = 36, YM = 520;
+  const xs = w => L + w / TOTAL_W * (W - L - Rr), ys = v => T + (1 - v / YM) * (H - T - B);
+  for (let v = 0; v <= 500; v += 100){ el("line", { x1:L, x2:W - Rr, y1:ys(v), y2:ys(v), class:"gridl" }, svg); tx(svg, L - 8, ys(v) + 4, v + "억", { class:"ax", "text-anchor":"end" }); }
+  for (let w = 0; w <= TOTAL_W; w += 5) tx(svg, xs(w), H - B + 18, "W" + w, { class:"ax", "text-anchor":"middle" });
+  [[BAC, "실행예산 " + BAC, "#7d8fae"], [CONTRACT, "계약 " + CONTRACT, "#46d3a0"]].forEach(([v, lab, c]) => {
+    el("line", { x1:L, x2:W - Rr, y1:ys(v), y2:ys(v), stroke:c, "stroke-opacity":.5, "stroke-dasharray":"2 4" }, svg);
+    tx(svg, W - Rr + 6, ys(v) + (v === BAC ? 12 : -2), lab, { class:"ax", fill:c });
+  });
+  const zone = [];
+  for (let w = 13; w <= NOW_W; w++) zone.push([xs(w), ys(ACc[w])]);
+  for (let w = NOW_W; w >= 13; w--) zone.push([xs(w), ys(EVc[w])]);
+  el("path", { d: pts(zone) + "Z", fill:"rgba(255,93,99,.18)", class:"fade-in", style:"animation-delay:1.1s" }, svg);
+  const pv = []; for (let w = 0; w <= TOTAL_W; w += 0.5) pv.push([xs(w), ys(BAC * plan(w) / 100)]);
+  el("path", { d:pts(pv), fill:"none", stroke:"#4a5b7a", "stroke-width":1.5, "stroke-dasharray":"4 5" }, svg);
+  const evP = el("path", { d:pts(EVc.map((v, w) => [xs(w), ys(v)])), fill:"none", stroke:"#5cd0ff", "stroke-width":2.2 }, svg);
+  const acP = el("path", { d:pts(ACc.map((v, w) => [xs(w), ys(v)])), fill:"none", stroke:"#ff5d63", "stroke-width":2.4 }, svg);
+  drawIn(evP, 0.1); drawIn(acP, 0.25);
+  const g = el("g", { class:"fade-in", style:"animation-delay:1.3s" }, svg);
+  el("path", { d:`M${xs(NOW_W)} ${ys(AC)} L${xs(TOTAL_W)} ${ys(EAC)}`, stroke:"#ff5d63", "stroke-dasharray":"3 4", "stroke-width":1.5, fill:"none" }, g);
+  el("circle", { cx:xs(TOTAL_W), cy:ys(EAC), r:4, fill:"#ff5d63" }, g);
+  tx(g, xs(TOTAL_W) - 6, ys(EAC) - 10, `EAC ${EAC.toFixed(1)}억`, { "font-size":11.5, fill:"#ff5d63", "text-anchor":"end", "font-weight":600 });
+  el("line", { x1:xs(NOW_W) + 10, x2:xs(NOW_W) + 10, y1:ys(AC), y2:ys(EV), stroke:"#ff5d63", "stroke-width":1.5 }, g);
+  tx(g, xs(NOW_W) + 16, (ys(AC) + ys(EV)) / 2 + 12, `+${OVER.toFixed(1)}억`, { fill:"#ff5d63", "font-size":12, "font-weight":600 });
+  el("circle", { cx:xs(NOW_W), cy:ys(AC), r:4.5, fill:"#060c17", stroke:"#ff5d63", "stroke-width":2 }, g);
+  el("circle", { cx:xs(NOW_W), cy:ys(EV), r:4, fill:"#060c17", stroke:"#5cd0ff", "stroke-width":2 }, g);
+
+  // profit meter
+  const m = $("c1m"), MH = 330, top = 40, bot = 290, vmax = 40, vmin = -15;
+  const my = v => top + (vmax - v) / (vmax - vmin) * (bot - top);
+  el("line", { x1:20, x2:300, y1:my(0), y2:my(0), stroke:"#7d8fae" }, m);
+  tx(m, 304, my(0) + 4, "0", { class:"ax", "text-anchor":"end" });
+  const bars = [
+    { x:60, v:TARGET, c:"#46d3a0", lab:"목표 이익", sub:`${(TARGET / CONTRACT * 100).toFixed(1)}%` },
+    { x:190, v:PROFIT_BASE, c:"#ff5d63", lab:"현 추세", sub:`${(PROFIT_BASE / CONTRACT * 100).toFixed(1)}%` }
+  ];
+  bars.forEach((b, i) => {
+    const y1 = my(Math.max(0, b.v)), y2 = my(Math.min(0, b.v));
+    const r = el("rect", { x:b.x, y:y1, width:70, height:y2 - y1, fill:b.c, "fill-opacity":.8 }, m);
+    if (!reduced){ r.style.transformOrigin = `0 ${my(0)}px`; r.style.transform = "scaleY(0)"; r.style.transition = `transform .8s cubic-bezier(.3,0,.2,1) ${0.3 + i * 0.4}s`; requestAnimationFrame(() => requestAnimationFrame(() => { r.style.transform = "scaleY(1)"; })); }
+    const vy = b.v >= 0 ? y1 - 10 : y2 + 20;
+    tx(m, b.x + 35, vy, eok(b.v, true), { "text-anchor":"middle", "font-size":15, fill:b.c, "font-weight":600 });
+    tx(m, b.x + 35, MH - 18, b.lab, { "text-anchor":"middle", "font-size":12, fill:"#dbe5f4", "font-family":"IBM Plex Sans KR, sans-serif" });
+    tx(m, b.x + 35, MH - 3, "이익률 " + b.sub, { "text-anchor":"middle", class:"ax" });
+  });
+  const ga = el("g", { class:"fade-in", style:"animation-delay:1.4s" }, m);
+  el("path", { d:`M134 ${my(TARGET)} H184 V${my(PROFIT_BASE)} H188`, fill:"none", stroke:"#ffb340", "stroke-dasharray":"3 3" }, ga);
+  tx(ga, 157, my(TARGET / 2) + 0, `${eok(TARGET - PROFIT_BASE)}`, { "font-size":12, fill:"#ffb340", "text-anchor":"middle", "font-weight":600 });
+  tx(ga, 157, my(TARGET / 2) + 15, "증발", { "font-size":11, fill:"#ffb340", "text-anchor":"middle" });
+  return null;
+}
+
+function costItems(){
+  const mx = Math.max(...ITEMS.map(i => i.ac));
+  body.innerHTML = `
+    <div class="suspects">${ITEMS.map(t => `
+      <article class="sus">
+        <div class="tag">ITEM ${t.code}</div>
+        <h3>${t.name}</h3>
+        <div class="row"><span>기성</span><div class="track p"><i data-w="${(t.ev / mx * 100).toFixed(1)}"></i></div><span>${t.ev.toFixed(1)}</span></div>
+        <div class="row"><span>실투입</span><div class="track a"><i data-w="${(t.ac / mx * 100).toFixed(1)}" style="background:${t.v[0] === "ok" ? "var(--cyan)" : "var(--red)"}"></i></div><span>${t.ac.toFixed(1)}</span></div>
+        <div class="note">${t.note}</div>
+        <div class="foot"><div class="contrib">+${t.var.toFixed(1)}<small>억 초과</small></div><span class="verdict chip ${t.v[0]}">${t.v[1]}</span></div>
+      </article>`).join("")}
+      <article class="sus revealed" style="border-style:dashed;display:flex;flex-direction:column;justify-content:center;gap:8px">
+        <div class="tag">PATTERN</div>
+        <h3 style="margin:0">두 갈래의 사건</h3>
+        <p style="margin:0;color:var(--muted);font-size:13px">노무 · 외주 · 장비 초과가 같은 주에 같이 튀었습니다. 따로 움직인 비목이 아니라 <b style="color:var(--amber)">공기 지연 하나</b>에 묶여 있습니다.</p>
+      </article>
+    </div>
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head"><span class="eyebrow">원가 초과 +${OVER.toFixed(1)}억 분해 · 폭포 차트</span><span class="eyebrow" style="color:var(--dim)">단위 억 원 · 기성 대비 실투입</span></div>
+      <div class="chart-scroll"><svg id="c2" viewBox="0 0 1000 250" role="img" aria-label="비목별 원가 초과 폭포 차트"></svg></div>
+    </div>`;
+  const svg = $("c2"), W = 1000, H = 250, L = 40, Rr = 20, T = 30, B = 40;
+  const steps = [
+    { lab:"재료비 · 철근", v:RB_VAR, c:"#ff5d63" },
+    { lab:"재료비 · 기타", v:MAT_OTHER, c:"#ff8a8e" },
+    { lab:"노무비", v:4.6, c:"#ffb340" },
+    { lab:"외주비", v:2.1, c:"#ffb340" },
+    { lab:"장비비", v:1.8, c:"#ffb340" },
+    { lab:"경비", v:ETC_FIXED, c:"#7d8fae" },
+    { lab:"합계", v:OVER, c:"#dbe5f4", total:true }
+  ];
+  const ymax = Math.ceil(OVER / 4) * 4, ys = v => T + (1 - v / ymax) * (H - T - B), bw = (W - L - Rr) / steps.length;
+  for (let v = 0; v <= ymax; v += 4){ el("line", { x1:L, x2:W - Rr, y1:ys(v), y2:ys(v), class:"gridl" }, svg); tx(svg, L - 8, ys(v) + 4, v, { class:"ax", "text-anchor":"end" }); }
+  let run = 0;
+  const dlStart = RB_VAR + MAT_OTHER;
+  el("rect", { x:L + 2 * bw + 6, y:T - 22, width:3 * bw - 12, height:H - B - T + 22, fill:"rgba(255,179,64,.06)", stroke:"rgba(255,179,64,.35)", "stroke-dasharray":"3 4" }, svg);
+  tx(svg, L + 2 * bw + 14, T - 8, `공기 연동 ${DL_TOTAL.toFixed(1)}억 · ${Math.round(DL_TOTAL / OVER * 100)}%`, { "font-size":11.5, fill:"#ffb340", "font-weight":600 });
+  steps.forEach((s, i) => {
+    const a = s.total ? 0 : run, b2 = s.total ? s.v : run + s.v;
+    const x = L + i * bw + bw * 0.2, w = bw * 0.6;
+    const r = el("rect", { x, y:ys(b2), width:w, height:Math.max(1.5, ys(a) - ys(b2)), fill:s.c, "fill-opacity":s.total ? .9 : .85 }, svg);
+    if (!reduced){ r.style.opacity = 0; r.style.transition = `opacity .35s ease ${0.15 + i * 0.18}s`; requestAnimationFrame(() => requestAnimationFrame(() => { r.style.opacity = 1; })); }
+    if (!s.total && i < steps.length - 2) el("line", { x1:x + w, x2:x + bw, y1:ys(b2), y2:ys(b2), stroke:"#4a5b7a", "stroke-dasharray":"2 3" }, svg);
+    tx(svg, x + w / 2, ys(b2) - 6, "+" + s.v.toFixed(1), { "text-anchor":"middle", "font-size":12, fill:s.c, "font-weight":600 });
+    tx(svg, x + w / 2, H - B + 18, s.lab, { "text-anchor":"middle", "font-size":12, fill:"#9fb0cc", "font-family":"IBM Plex Sans KR, sans-serif" });
+    if (!s.total) run = b2;
+  });
+  const cards = [...body.querySelectorAll(".sus:not(.revealed)")];
+  const timers = [];
+  const fill = c => c.querySelectorAll(".track i").forEach(i => { i.style.width = i.dataset.w + "%"; });
+  const finish = () => { cards.forEach(c => { fill(c); c.classList.remove("scanning"); c.classList.add("revealed"); }); cards[0].classList.add("culprit"); };
+  if (reduced){ finish(); return null; }
+  cards.forEach((c, i) => {
+    timers.push(setTimeout(() => { c.classList.add("scanning"); fill(c); }, 120 + i * 240));
+    timers.push(setTimeout(() => { c.classList.remove("scanning"); c.classList.add("revealed"); }, 120 + i * 240 + 460));
+  });
+  timers.push(setTimeout(finish, 120 + cards.length * 240 + 480));
+  return () => timers.forEach(clearTimeout);
+}
+
+function costLink(){
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">공기 연동 원가 (노무 · 외주 · 장비) × 사건 A의 주간 SPI</span>
+        <div class="legend"><span style="color:var(--amber)"><i class="sw" style="height:8px"></i>주간 공기 연동 원가</span><span style="color:var(--cyan)"><i class="sw"></i>주간 SPI (사건 A)</span></div>
+      </div>
+      <div class="chart-scroll"><svg id="c3" viewBox="0 0 1000 330" role="img" aria-label="주간 공기 연동 원가와 SPI 비교"></svg></div>
+    </div>
+    <div class="ev-grid">
+      <div class="ev"><div class="top"><span class="eyebrow">공기 연동 원가</span><span class="chip warn">초과의 ${Math.round(DL_TOTAL / OVER * 100)}%</span></div><div class="r" style="color:var(--amber)">${DL_TOTAL.toFixed(1)}억</div><p>SPI가 떨어진 바로 그 주부터 쌓이기 시작했습니다.</p></div>
+      <div class="ev"><div class="top"><span class="eyebrow">지연 1일당 원가</span><span class="chip mute">${DL_TOTAL.toFixed(1)}억 ÷ ${DELAY}일</span></div><div class="r">${manwon(DAILY_DL)}</div><p>공정이 하루 밀릴 때마다 사라지는 직접 원가입니다.</p></div>
+      <div class="ev key"><div class="top"><span class="eyebrow">지체상금 포함 1일 비용</span><span class="chip crit">핵심 지표</span></div><div class="r">${manwon(DAILY_ALL)}</div><p>공기 만회 대책은 이 금액보다 싸면 무조건 이득입니다.</p></div>
+    </div>`;
+  const svg = $("c3"), W = 1000, H = 330, L = 50, Rr = 50, T = 34, B = 44, n = NOW_W, bw = (W - L - Rr) / n;
+  const ymax = 1.6, ys = v => T + (1 - v / ymax) * (H - T - B), ys2 = v => T + (1 - v / 1.2) * (H - T - B);
+  [0, 0.4, 0.8, 1.2, 1.6].forEach(v => { el("line", { x1:L, x2:W - Rr, y1:ys(v), y2:ys(v), class:"gridl" }, svg); tx(svg, L - 8, ys(v) + 4, v.toFixed(1) + "억", { class:"ax", "text-anchor":"end" }); });
+  [0, 0.6, 1.2].forEach(v => tx(svg, W - Rr + 8, ys2(v) + 4, v.toFixed(1), { class:"ax", fill:"#5cd0ff" }));
+  const bx = L + 13 * bw, bx2 = L + 16 * bw;
+  el("rect", { x:bx, y:T - 20, width:bx2 - bx, height:H - B - T + 20, fill:"rgba(255,93,99,.07)" }, svg);
+  tx(svg, bx + 6, T - 6, `레미콘사 귀책 구간 W14–W16 · ${CLAIM.toFixed(1)}억`, { "font-size":11.5, fill:"#ff5d63", "font-weight":600 });
+  DL_W.forEach((v, i) => {
+    const x = L + i * bw + bw * 0.2, w = bw * 0.6;
+    if (v > 0){
+      const r = el("rect", { x, y:ys(v), width:w, height:ys(0) - ys(v), fill:"#ffb340", "fill-opacity":.8 }, svg);
+      if (!reduced){ r.style.transformOrigin = `0 ${ys(0)}px`; r.style.transform = "scaleY(0)"; r.style.transition = `transform .5s cubic-bezier(.3,0,.2,1) ${0.2 + (i - 13) * 0.06}s`; requestAnimationFrame(() => requestAnimationFrame(() => { r.style.transform = "scaleY(1)"; })); }
+      tx(svg, x + w / 2, ys(v) - 6, v.toFixed(1), { "text-anchor":"middle", "font-size":11, fill:"#ffb340" });
+    } else el("rect", { x, y:ys(0) - 1.5, width:w, height:1.5, fill:"#26395c" }, svg);
+    tx(svg, x + w / 2, H - B + 18, "W" + (i + 1), { class:"ax", "text-anchor":"middle" });
+  });
+  const sp = SPI.map((v, i) => [L + i * bw + bw / 2, ys2(v)]);
+  el("path", { d:pts(sp), fill:"none", stroke:"rgba(92,208,255,.25)", "stroke-width":6 }, svg);
+  const spP = el("path", { d:pts(sp), fill:"none", stroke:"#5cd0ff", "stroke-width":2 }, svg);
+  sp.forEach(p => el("circle", { cx:p[0], cy:p[1], r:2.5, fill:"#5cd0ff" }, svg));
+  drawIn(spP, 0.4);
+  return null;
+}
+
+function costRebar(){
+  body.innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><div class="k">철근 원가 초과</div><div class="v" style="color:var(--red)">+${RB_VAR.toFixed(1)}<small>억</small></div></div>
+      <div class="kpi"><div class="k">단가 차이</div><div class="v">${PV_RB.toFixed(1)}<small>억</small></div></div>
+      <div class="kpi crit"><div class="k">수량 (로스) 차이</div><div class="v">${QV_RB.toFixed(1)}<small>억</small></div></div>
+      <div class="kpi warn"><div class="k">로스율 계획 → 실적</div><div class="v">${LOSS_PLAN.toFixed(1)}→${LOSS_ACT.toFixed(1)}<small>%</small></div></div>
+    </div>
+    <div class="s1-grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1.5fr)">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">철근 원가 차이 분해</span><span class="eyebrow" style="color:var(--dim)">억 원</span></div>
+        <svg id="c4a" viewBox="0 0 420 300" style="display:block;width:100%;height:auto" role="img" aria-label="철근 예산 대비 단가 차이와 수량 차이"></svg>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">주간 철근 로스율 · W${RB_W0}–W${NOW_W}</span>
+          <div class="legend"><span style="color:var(--red)"><i class="sw"></i>로스율</span><span style="color:var(--muted)"><i class="sw" style="height:8px;opacity:.5"></i>설계 물량(t)</span></div>
+        </div>
+        <div class="chart-scroll"><svg id="c4b" viewBox="0 0 640 300" role="img" aria-label="주간 철근 로스율 추이"></svg></div>
+      </div>
+    </div>
+    <div class="hint" style="margin-top:14px">잔여 철근 ${RB_REMAIN.toLocaleString("ko-KR")}t 기준, 로스율 1%p마다 <b style="color:var(--fg)">${eok(PER_LOSS_PT)}</b>이 더 나갑니다. 지금 로스율이 유지되면 준공까지 <b style="color:var(--red)">${eok(PER_LOSS_PT * (LOSS_ACT - LOSS_PLAN))}</b>이 추가로 샙니다.</div>`;
+  // decomposition
+  const a = $("c4a"), H = 300, T = 30, B = 46, L = 20;
+  const lo = Math.floor(RB_BUDGET / 5) * 5 - 5, hi = Math.ceil((RB_BUDGET + RB_VAR) / 5) * 5;
+  const ys = v => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+  const cols = [
+    { lab:"예산", a:lo, b:RB_BUDGET, c:"#7d8fae", t:RB_BUDGET.toFixed(1) },
+    { lab:"단가 차이", a:RB_BUDGET, b:RB_BUDGET + PV_RB, c:"#ffb340", t:"+" + PV_RB.toFixed(1) },
+    { lab:"수량 차이", a:RB_BUDGET + PV_RB, b:RB_BUDGET + RB_VAR, c:"#ff5d63", t:"+" + QV_RB.toFixed(1) },
+    { lab:"실투입", a:lo, b:RB_BUDGET + RB_VAR, c:"#dbe5f4", t:(RB_BUDGET + RB_VAR).toFixed(1) }
+  ];
+  const cw = (420 - L * 2) / 4;
+  cols.forEach((c, i) => {
+    const x = L + i * cw + cw * 0.18, w = cw * 0.64;
+    el("rect", { x, y:ys(c.b), width:w, height:ys(c.a) - ys(c.b), fill:c.c, "fill-opacity":.85, class:"fade-in", style:`animation-delay:${0.2 + i * 0.25}s` }, a);
+    tx(a, x + w / 2, ys(c.b) - 7, c.t, { "text-anchor":"middle", "font-size":13, fill:c.c, "font-weight":600 });
+    tx(a, x + w / 2, H - B + 20, c.lab, { "text-anchor":"middle", "font-size":12.5, fill:"#9fb0cc", "font-family":"IBM Plex Sans KR, sans-serif" });
+  });
+  el("path", { d:`M${L} ${H - B} h6 l-6 4 l6 4 l-6 4 h6`, fill:"none", stroke:"#4a5b7a" }, a);
+  tx(a, 400, H - 6, `단가 ${P_PLAN}→${P_ACT}만 원/t`, { class:"ax", "text-anchor":"end" });
+  // weekly loss
+  const s = $("c4b"), W = 640, LL = 44, Rr = 40, n = RB_Q.length, bw = (W - LL - Rr) / n;
+  const yl = v => T + (1 - v / 30) * (H - T - B), yq = v => T + (1 - v / 600) * (H - T - B);
+  [0, 10, 20, 30].forEach(v => { el("line", { x1:LL, x2:W - Rr, y1:yl(v), y2:yl(v), class:"gridl" }, s); tx(s, LL - 8, yl(v) + 4, v + "%", { class:"ax", "text-anchor":"end" }); });
+  const bA = 10, bB = 13;
+  el("rect", { x:LL + bA * bw, y:T - 18, width:(bB - bA + 1) * bw, height:H - B - T + 18, fill:"rgba(255,93,99,.07)" }, s);
+  tx(s, W - Rr, T - 6, "긴급 현장가공 전환 · 대체 업체", { "font-size":11, fill:"#ff5d63", "font-weight":600, "text-anchor":"end" });
+  RB_Q.forEach((q, i) => {
+    el("rect", { x:LL + i * bw + bw * 0.22, y:yq(q), width:bw * 0.56, height:yq(0) - yq(q), fill:"#7d8fae", "fill-opacity":.22 }, s);
+    if ((i + RB_W0) % 3 === 0 || i === n - 1) tx(s, LL + i * bw + bw / 2, H - B + 18, "W" + (i + RB_W0), { class:"ax", "text-anchor":"middle" });
+  });
+  el("line", { x1:LL, x2:W - Rr, y1:yl(LOSS_PLAN), y2:yl(LOSS_PLAN), stroke:"#46d3a0", "stroke-dasharray":"4 4" }, s);
+  tx(s, W - Rr + 4, yl(LOSS_PLAN) + 4, "계획 3%", { class:"ax", fill:"#46d3a0", "font-size":10 });
+  const lp = RB_L.map((v, i) => [LL + i * bw + bw / 2, yl(v)]);
+  const lpath = el("path", { d:pts(lp), fill:"none", stroke:"#ff5d63", "stroke-width":2.2, "stroke-linejoin":"round" }, s);
+  lp.forEach((p, i) => { el("circle", { cx:p[0], cy:p[1], r:2.6, fill:"#ff5d63" }, s); if (RB_L[i] > 20) tx(s, p[0], p[1] - 8, RB_L[i].toFixed(1), { "text-anchor":"middle", "font-size":10.5, fill:"#ff5d63" }); });
+  drawIn(lpath, 0.3);
+  return null;
+}
+
+function costAction(){
+  body.innerHTML = `
+    <div class="sim">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">손익 회복 대책</span></div>
+        <div class="ctl">
+          <label class="tg" for="mRecov"><span class="ctl-head" style="flex:1"><b>공정 만회안 적용</b><span>${eok(MEASURES.recov.net, true)}</span></span><input type="checkbox" id="mRecov"><span class="sl"></span></label>
+          <p>사건 A 최소 비용 조합 (작업조 +${BEST_A.c}조${BEST_A.s ? " · 일요일 작업" : ""}${BEST_A.k ? " · 데크플레이트" : ""}) · ${MEASURES.recov.detail}</p>
+        </div>
+        <div class="ctl">
+          <label class="tg" for="mFactory"><span class="ctl-head" style="flex:1"><b>철근 공장가공 표준화</b><span>${eok(MEASURES.factory.net, true)}</span></span><input type="checkbox" id="mFactory"><span class="sl"></span></label>
+          <p>${MEASURES.factory.detail}</p>
+        </div>
+        <div class="ctl">
+          <label class="tg" for="mEs"><span class="ctl-head" style="flex:1"><b>물가변동 계약금액 조정 신청</b><span>${eok(MEASURES.es.net, true)}</span></span><input type="checkbox" id="mEs"><span class="sl"></span></label>
+          <p>${MEASURES.es.detail}</p>
+        </div>
+        <div class="ctl" style="border-bottom:0">
+          <div class="ctl-head"><b>레미콘사 손해배상 청구 회수율</b><span>최대 ${eok(CLAIM)}</span></div>
+          <div class="seg" role="radiogroup" aria-label="손해배상 회수율">
+            ${[0,30,60,90].map(v => `<input type="radio" name="claim" id="claim${v}" value="${v}" ${v === 0 ? "checked" : ""}><label for="claim${v}">${v}%</label>`).join("")}
+          </div>
+          <p>${MEASURES.claim.detail} · 사건 A 증거 E-04가 근거 자료</p>
+        </div>
+        <div class="sim-actions">
+          <button class="btn" type="button" id="allBtn">전체 적용</button>
+          <button class="btn" type="button" id="resetB">초기화</button>
+        </div>
+      </div>
+      <div class="panel result">
+        <div class="panel-head" style="margin:0"><span class="eyebrow">준공 예상 손익</span><span class="eyebrow" style="color:var(--dim)">목표 ${eok(TARGET, true)} · 이익률 ${(TARGET / CONTRACT * 100).toFixed(1)}%</span></div>
+        <div class="fc"><div class="date" id="pfVal">—</div><span class="chip" id="pfChip">—</span></div>
+        <svg id="c5" class="tl" viewBox="0 0 520 250" role="img" aria-label="대책별 손익 회복 폭포 차트"></svg>
+        <div class="hint" id="hintB"></div>
+      </div>
+    </div>`;
+  const ids = { recov:"mRecov", factory:"mFactory", es:"mEs" };
+  const svg = $("c5"), W = 520, L = 112, Rr = 64, vmin = -15, vmax = 40;
+  const xv = v => L + (v - vmin) / (vmax - vmin) * (W - L - Rr);
+  function update(){
+    const on = { recov:$("mRecov").checked, factory:$("mFactory").checked, es:$("mEs").checked };
+    const rate = +body.querySelector('input[name="claim"]:checked').value / 100;
+    const rows = [
+      { lab:"현 추세", v:PROFIT_BASE, base:true },
+      { lab:"공정 만회안", v:MEASURES.recov.net, on:on.recov },
+      { lab:"철근 공장가공", v:MEASURES.factory.net, on:on.factory },
+      { lab:"물가변동 조정", v:MEASURES.es.net, on:on.es },
+      { lab:`레미콘사 청구 ${Math.round(rate * 100)}%`, v:CLAIM * (rate || 0.9), on:rate > 0, scale:rate }
+    ];
+    let run = PROFIT_BASE;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    [-10, 0, 10, 20, 30, 40].forEach(v => { el("line", { x1:xv(v), x2:xv(v), y1:18, y2:226, class:"gridl" }, svg); tx(svg, xv(v), 244, v + "억", { class:"ax", "text-anchor":"middle" }); });
+    el("line", { x1:xv(0), x2:xv(0), y1:14, y2:228, stroke:"#7d8fae" }, svg);
+    el("line", { x1:xv(TARGET), x2:xv(TARGET), y1:14, y2:228, stroke:"#46d3a0", "stroke-dasharray":"4 4" }, svg);
+    tx(svg, xv(TARGET) + 4, 12, "목표 " + TARGET, { class:"ax", fill:"#46d3a0" });
+    const rh = 34;
+    rows.forEach((r, i) => {
+      const y = 22 + i * rh;
+      tx(svg, 8, y + 17, r.lab, { "font-size":13, fill: r.base || r.on ? "#dbe5f4" : "#4a5b7a", "font-family":"IBM Plex Sans KR, sans-serif" });
+      if (r.base){
+        el("rect", { x:xv(Math.min(0, r.v)), y:y + 4, width:Math.abs(xv(r.v) - xv(0)), height:20, fill:"#ff5d63", "fill-opacity":.85 }, svg);
+        tx(svg, xv(Math.min(0, r.v)) - 6, y + 18, eok(r.v, true), { "font-size":13, fill:"#ff5d63", "text-anchor":"end", "font-weight":600 });
+        return;
+      }
+      const delta = r.on ? (r.scale !== undefined ? CLAIM * r.scale : r.v) : r.v;
+      const x0 = xv(run), x1 = xv(run + delta);
+      el("rect", { x:Math.min(x0, x1), y:y + 4, width:Math.abs(x1 - x0), height:20, fill: r.on ? "#5cd0ff" : "none", "fill-opacity":.8, stroke: r.on ? "none" : "#4a5b7a", "stroke-dasharray":"3 3" }, svg);
+      tx(svg, Math.max(x0, x1) + 6, y + 18, (r.on ? "" : "미적용 ") + eok(delta, true), { "font-size":13, fill: r.on ? "#5cd0ff" : "#4a5b7a" });
+      if (r.on) run += delta;
+    });
+    const yF = 22 + rows.length * rh;
+    tx(svg, 8, yF + 17, "조치 후", { "font-size":13, fill:"#dbe5f4", "font-weight":600, "font-family":"IBM Plex Sans KR, sans-serif" });
+    const fc = run >= 0 ? "#46d3a0" : "#ff5d63";
+    el("rect", { x:xv(Math.min(0, run)), y:yF + 4, width:Math.max(1.5, Math.abs(xv(run) - xv(0))), height:20, fill:fc, "fill-opacity":.9 }, svg);
+    tx(svg, run >= 0 ? xv(run) + 6 : xv(run) - 6, yF + 18, eok(run, true), { "font-size":13, fill:fc, "text-anchor": run >= 0 ? "start" : "end", "font-weight":700 });
+    $("pfVal").textContent = eok(run, true) + " 원";
+    $("pfVal").style.color = fc;
+    const chip = $("pfChip");
+    chip.className = "chip " + (run < 0 ? "crit" : run < TARGET ? "warn" : "ok");
+    chip.textContent = `이익률 ${(run / CONTRACT * 100).toFixed(1)}%` + (run < 0 ? " · 적자" : run < TARGET ? " · 흑자 전환" : " · 목표 달성");
+    const any = on.recov || on.factory || on.es || rate > 0;
+    $("hintB").innerHTML = !any
+      ? `가장 큰 한 수는 <b style="color:var(--fg)">공정 만회안</b>입니다. 원가 대책이 아니라 공정 대책이 손익을 가장 많이 돌려놓습니다.`
+      : run < 0 ? `아직 적자입니다. 흑자 전환까지 ${eok(-run)}이 더 필요합니다.`
+      : run < TARGET ? `적자는 막았지만 목표 이익까지 ${eok(TARGET - run)}이 부족합니다. 이미 투입된 초과 원가 ${OVER.toFixed(1)}억은 되돌릴 수 없어서, 남은 공정에서의 관리가 관건입니다.`
+      : `목표 이익을 회복했습니다.`;
+  }
+  ["mRecov","mFactory","mEs"].forEach(id => $(id).addEventListener("change", update));
+  body.querySelectorAll('input[name="claim"]').forEach(i => i.addEventListener("change", update));
+  $("allBtn").addEventListener("click", () => { $("mRecov").checked = true; $("mFactory").checked = true; $("mEs").checked = true; $("claim90").checked = true; update(); });
+  $("resetB").addEventListener("click", () => { $("mRecov").checked = false; $("mFactory").checked = false; $("mEs").checked = false; $("claim0").checked = true; update(); });
+  update();
+  return null;
+}
+
+const SCENES_B = [
+  { label:"사건 개요", title:"원가 누수 감지", meta:`기준일 ${ymd(BASE_DATE)} · 실행예산 ${BAC}억`, scan:"원가 데이터 로드 중", render:costOverview,
+    say:`소장님, 이번엔 돈 얘기예요. 지금까지 기성으로 인정받은 원가는 [[${EV.toFixed(1)}억]]인데 실제로 쓴 돈은 [[${AC.toFixed(1)}억]]이에요. ${OVER.toFixed(1)}억이 새고 있어요. CPI가 ${CPI.toFixed(2)}라서, 이 효율로 끝까지 가면 목표 이익 ${TARGET}억은 사라지고 지체상금까지 합치면 준공 때 [[${eok(PROFIT_BASE, true)} 적자]]예요.`,
+    log:`원가 초과 +${OVER.toFixed(1)}억 · CPI ${CPI.toFixed(2)}` },
+  { label:"비목 대조", title:"비목별 용의자 대조", meta:`비목 5개 · 기성 대비 실투입`, scan:"비목별 원가 대조 중", render:costItems,
+    say:`비목별로 하나씩 대조해 봤어요. 경비는 깨끗해요. 그런데 이번엔 범인이 하나가 아니에요. 재료비에서는 [[철근]]이 튀었고, 노무비, 외주비, 장비비는 [[같은 주에 같이]] 튀었어요. 이 셋은 각자 움직인 게 아니에요. 한 사건에 묶여 있어요.`,
+    log:`두 갈래: 철근 / 공기 연동 비목 ${DL_TOTAL.toFixed(1)}억` },
+  { label:"사건 연결", title:"두 사건의 연결고리", meta:`사건 A 주간 SPI 교차 대조`, scan:"사건 A 데이터와 교차 대조 중", render:costLink,
+    say:`노무비, 외주비, 장비비 초과분을 주별로 펼쳐 보면 사건 A의 SPI 그래프와 정확히 맞물려요. 공기 지연이 원가로 번진 거예요. 이것만 [[${DL_TOTAL.toFixed(1)}억]], 초과의 ${Math.round(DL_TOTAL / OVER * 100)}%예요. 계산하면 하루 늦어질 때마다 ${manwon(DAILY_DL)}, 지체상금까지 더하면 [[하루 ${manwon(DAILY_ALL)}]]이 사라져요. 공기 만회 대책이 이보다 싸면 무조건 남는 장사예요.`,
+    log:`지연 1일 = ${manwon(DAILY_ALL)} (지체상금 포함)` },
+  { label:"철근 정밀", title:"철근 원가 정밀 감식", meta:`철근 ${RB_DESIGN.toLocaleString("ko-KR")}t · W${RB_W0}–W${NOW_W}`, scan:"철근 투입 물량 감식 중", render:costRebar,
+    say:`다들 철근 단가가 올라서 그렇다고 했죠. 그런데 단가 차이는 [[${PV_RB.toFixed(1)}억]]이고, 수량 차이가 [[${QV_RB.toFixed(1)}억]]으로 더 커요. 로스율이 계획은 3%인데 실적은 ${LOSS_ACT.toFixed(1)}%예요. 16주차에 레미콘 재개 물량을 맞추려고 대체 업체 현장가공으로 돌렸는데, 그때 로스가 [[20%를 넘었어요]]. 철근은 시장이 아니라 현장에서 새고 있었어요.`,
+    log:`철근 수량 차이 ${QV_RB.toFixed(1)}억 > 단가 차이 ${PV_RB.toFixed(1)}억` },
+  { label:"손익 회복", title:"손익 회복 시뮬레이션", meta:`계약 ${CONTRACT}억 · 목표 이익률 ${(TARGET / CONTRACT * 100).toFixed(1)}%`, scan:"손익 시나리오 계산 중", render:costAction,
+    say:`대책을 하나씩 켜 보세요. 재미있는 건 가장 큰 한 수가 원가 대책이 아니라 [[공정 만회안]]이라는 거예요. 지체상금과 간접비를 한꺼번에 막아 주거든요. 레미콘사 귀책 구간 ${CLAIM.toFixed(1)}억은 사건 A의 증거를 그대로 손해배상 청구 근거로 쓸 수 있어요.`,
+    log:`손익 회복 시뮬레이션 · 현 추세 ${eok(PROFIT_BASE, true)}` }
+];
+
 /* ======================== CONTROLLER ======================== */
+const CASES = {
+  schedule: { no:"SFL-26-1115-A", sub:"공정 지연 수사", scenes:SCENES },
+  cost:     { no:"SFL-26-1115-B", sub:"원가 초과 수사", scenes:SCENES_B }
+};
+let caseId = "schedule", SC = SCENES;
 let cur = -1, typing = null, autoTimer = null, auto = false, busy = false;
-const visited = new Set();
+const visitedBy = { schedule:new Set(), cost:new Set() };
 const stepList = $("stepList");
-stepList.innerHTML = SCENES.map((s, i) => `<button class="step" type="button" data-i="${i}"><span class="n">${String(i + 1).padStart(2, "0")}</span><span class="l">${s.label}</span></button>`).join("");
+function buildSteps(){
+  stepList.innerHTML = SC.map((s, i) => `<button class="step" type="button" data-i="${i}"><span class="n">${String(i + 1).padStart(2, "0")}</span><span class="l">${s.label}</span></button>`).join("");
+}
 stepList.addEventListener("click", e => { const b = e.target.closest(".step"); if (b) go(+b.dataset.i); });
 
 function speak(text){
@@ -981,56 +1401,76 @@ function speak(text){
   typing = { stop(){ done = true; clearTimeout(tm); persona.classList.remove("speaking"); }, finish };
 }
 
-function addLog(i){
-  if (visited.has(i)) return;
-  visited.add(i);
-  const ol = $("log");
-  const empty = ol.querySelector(".empty"); if (empty) empty.remove();
+function renderLog(focus){
+  const visited = visitedBy[caseId], ol = $("log");
   const items = [...visited].sort((a, b) => a - b);
-  ol.innerHTML = items.map(k => `<li><span class="id">E-${String(k + 1).padStart(2, "0")}</span><span>${SCENES[k].log}</span></li>`).join("");
-  $("logCount").textContent = `${visited.size} / ${SCENES.length}`;
-  const li = ol.children[items.indexOf(i)]; if (li) li.scrollIntoView({ block:"nearest" });
+  ol.innerHTML = items.length ? items.map(k => `<li${k === focus ? "" : ' style="animation:none"'}><span class="id">E-${String(k + 1).padStart(2, "0")}</span><span>${SC[k].log}</span></li>`).join("") : `<li class="empty">수집된 증거가 없습니다.</li>`;
+  $("logCount").textContent = `${visited.size} / ${SC.length}`;
+  const li = ol.children[items.indexOf(focus)]; if (li) li.scrollIntoView({ block:"nearest" });
 }
 
 function render(i){
   if (cleanup) { try { cleanup(); } catch (e) {} cleanup = null; }
-  const s = SCENES[i];
-  $("sceneStep").textContent = `STEP ${String(i + 1).padStart(2, "0")} / ${String(SCENES.length).padStart(2, "0")}`;
+  const s = SC[i];
+  $("sceneStep").textContent = `STEP ${String(i + 1).padStart(2, "0")} / ${String(SC.length).padStart(2, "0")}`;
   $("sceneTitle").textContent = s.title;
   $("sceneMeta").textContent = s.meta;
   body.scrollTop = 0;
   cleanup = s.render() || null;
   speak(s.say);
-  addLog(i);
+  const fresh = !visitedBy[caseId].has(i);
+  visitedBy[caseId].add(i);
+  renderLog(fresh ? i : -1);
 }
 
-function go(i){
-  if (i < 0 || i >= SCENES.length || i === cur || busy) return;
+function go(i, force){
+  if (i < 0 || i >= SC.length || busy) return;
+  if (i === cur && !force) return;
   clearTimeout(autoTimer);
-  const first = cur === -1;
+  const first = cur === -1 && !force;
   cur = i;
+  const visited = visitedBy[caseId];
   [...stepList.children].forEach((b, k) => { b.classList.toggle("active", k === i); b.classList.toggle("done", visited.has(k) || k < i); b.setAttribute("aria-current", k === i ? "step" : "false"); });
   $("prevBtn").disabled = i === 0;
-  $("nextBtn").disabled = i === SCENES.length - 1;
-  $("nextBtn").textContent = i === SCENES.length - 1 ? "브리핑 완료" : "다음 증거 →";
+  $("nextBtn").disabled = i === SC.length - 1;
+  $("nextBtn").textContent = i === SC.length - 1 ? "브리핑 완료" : "다음 증거 →";
   if (first || reduced) { render(i); return; }
   const scan = $("scan");
-  $("scanLabel").textContent = SCENES[i].scan;
+  $("scanLabel").textContent = SC[i].scan;
   scan.hidden = false; scan.classList.remove("run"); void scan.offsetWidth; scan.classList.add("run");
   busy = true;
   setTimeout(() => { scan.hidden = true; scan.classList.remove("run"); busy = false; render(i); }, 650);
 }
 
+function setCase(id, initial){
+  if (!CASES[id] || (id === caseId && !initial) || busy) return;
+  setAuto(false);
+  caseId = id; SC = CASES[id].scenes;
+  document.querySelectorAll(".case-tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.case === id)));
+  $("caseNo").textContent = CASES[id].no;
+  $("brandSub").textContent = "현장 포렌식 랩 · " + CASES[id].sub;
+  buildSteps();
+  renderLog(-1);
+  cur = -1;
+  go(0, !initial);
+}
+document.querySelectorAll(".case-tab").forEach(t => t.addEventListener("click", () => {
+  if (t.dataset.case === caseId || busy) return;
+  try { history.replaceState(null, "", "#" + t.dataset.case); } catch (e) {}
+  setCase(t.dataset.case);
+}));
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (CASES[h] && h !== caseId) setCase(h); });
+
 function scheduleAuto(){
   clearTimeout(autoTimer);
   if (!auto) return;
-  if (cur >= SCENES.length - 1) { setAuto(false); return; }
+  if (cur >= SC.length - 1) { setAuto(false); return; }
   autoTimer = setTimeout(() => go(cur + 1), 4200);
 }
 function setAuto(v){
   auto = v; $("autoBtn").setAttribute("aria-pressed", String(v));
   $("autoBtn").textContent = v ? "자동 브리핑 중지" : "자동 브리핑";
-  if (v) { if (cur >= SCENES.length - 1) go(0); else if (!$("persona").classList.contains("speaking")) scheduleAuto(); }
+  if (v) { if (cur >= SC.length - 1) go(0); else if (!$("persona").classList.contains("speaking")) scheduleAuto(); }
   else clearTimeout(autoTimer);
 }
 
@@ -1049,6 +1489,6 @@ const clock = $("clock");
 const tickClock = () => { const d = new Date(); clock.textContent = [d.getHours(), d.getMinutes(), d.getSeconds()].map(v => String(v).padStart(2, "0")).join(":"); };
 tickClock(); setInterval(tickClock, 1000);
 
-go(0);
+setCase(CASES[location.hash.slice(1)] ? location.hash.slice(1) : "schedule", true);
 })();
 </script>
