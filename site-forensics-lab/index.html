@@ -359,6 +359,7 @@ svg text{font-family:var(--f-mono)}
       <button class="case-tab" type="button" role="tab" data-case="schedule" aria-selected="true"><b>CASE A</b>공정 지연</button>
       <button class="case-tab" type="button" role="tab" data-case="cost" aria-selected="false"><b>CASE B</b>원가 초과</button>
       <button class="case-tab" type="button" role="tab" data-case="safety" aria-selected="false"><b>CASE C</b>안전 사고</button>
+      <button class="case-tab" type="button" role="tab" data-case="quality" aria-selected="false"><b>CASE D</b>품질 하자</button>
     </div>
     <div class="top-right">
       <span class="live"><i></i>LIVE ANALYSIS</span>
@@ -1765,15 +1766,332 @@ const SCENES_C = [
     log:`8주 예측 · 만회안 + 버디제 패키지 필요` }
 ];
 
+/* ======================== CASE D : QUALITY DATA ======================== */
+const Q_W = [2,3,4,5,6,6,7,7,8,8,7,8,8,6,4,18,27,28,22,16,14];
+const Q_PASS = [95,94,93,94,92,93,92,91,92,93,92,91,92,90,90,72,61,63,70,76,79];
+const Q_N = Q_W.reduce((s, v) => s + v, 0);
+const Q_LATE = Q_W.slice(15).reduce((s, v) => s + v, 0);
+const Q_PASS_MIN = Math.min(...Q_PASS);
+const Q_TYPES = [
+  { name:"균열", n:58 }, { name:"콜드조인트", n:41 }, { name:"피복 부족", n:36 }, { name:"허니콤 (곰보)", n:24 },
+  { name:"거푸집 배부름", n:19 }, { name:"레벨 불량", n:15 }, { name:"매립물 누락", n:12 }, { name:"기타", n:9 }
+];
+const Q_TOP3 = (Q_TYPES[0].n + Q_TYPES[1].n + Q_TYPES[2].n) / Q_N;
+const FLOORS = [
+  { f:"B1", n:38, area:2430 }, { f:"1F", n:41, area:2430 }, { f:"2F", n:52, area:2430 }, { f:"3F", n:83, area:972 }
+];
+FLOORS.forEach(f => { f.d = f.n / f.area * 100; });
+const Q_DENS_X = FLOORS[3].d / ((FLOORS[0].d + FLOORS[1].d + FLOORS[2].d) / 3);
+// compressive strength (28일, MPa)
+const FCK = 27;
+const POURS_A = [31.8,32.6,30.9,33.1,32.2,31.4,32.9,31.0,32.5,33.4,31.7,32.0,30.8,31.9].map((v, i) => ({ d:addDays(weekStart(5), i * 4 + 1), v, sup:"A" }));
+const POURS_B = [
+  { d:new Date(2026, 9, 9),  v:24.9, sup:"B", ok:true, tag:"3F-A" },
+  { d:new Date(2026, 9, 13), v:26.1, sup:"B", ok:true },
+  { d:new Date(2026, 9, 17), v:27.4, sup:"B", ok:true },
+  { d:new Date(2026, 9, 20), v:26.6, sup:"B", ok:false },
+  { d:new Date(2026, 9, 24), v:27.8, sup:"B", ok:false }
+];
+const AVG_A = avg(POURS_A.map(p => p.v)), B_CONF = POURS_B.filter(p => p.ok), AVG_B = avg(B_CONF.map(p => p.v));
+const COVER_TOTAL = 36, COVER_FIELD = 31, COVER_SHARE = COVER_TOTAL ? COVER_FIELD / COVER_TOTAL : 0;
+// 3F plan
+const Q3 = { A:44, B:23, J:16 };
+const Q_ITEMS = {
+  core:   { label:"3F-A 코어 채취 · 강도 판정", now:0.15, later:1.68, after:0.56, note:"재시공 4.8억 × 확률 35% → 판정 후 부분 보강으로 전환" },
+  crack:  { label:"균열 에폭시 주입 보수",     now:0.38, later:1.14, after:0,    note:"준공 후 누수 하자로 번지면 1.9억 × 60%" },
+  cover:  { label:"피복 부족 구간 방청 · 단면 보강", now:0.52, later:0.96, after:0, note:"준공 후 철근 부식 하자 2.4억 × 40%" },
+  check:  { label:"4F–6F 이음부 · 피복 사진 검측 의무화", now:0.08, later:1.50, after:0.60, note:"3F 수준 결함 재발 시 재작업 1.5억 → 60% 예방" }
+};
+const Q_BASE = Object.values(Q_ITEMS).reduce((s, q) => s + q.later, 0);
+
+/* ======================== CASE D : SCENES ======================== */
+function qualityOverview(){
+  body.innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><div class="k">품질 부적합 (NCR)</div><div class="v">${Q_N}<small>건</small></div></div>
+      <div class="kpi warn"><div class="k">16주차 이후 발생</div><div class="v">${Q_LATE}<small>건</small></div></div>
+      <div class="kpi crit"><div class="k">검측 1회 합격률 최저</div><div class="v">${Q_PASS_MIN}<small>%</small></div></div>
+      <div class="kpi crit"><div class="k">3F 결함 밀도</div><div class="v">${Q_DENS_X.toFixed(1)}<small>배</small></div></div>
+    </div>
+    <div class="s1-grid">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">주간 부적합 건수 × 검측 1회 합격률</span>
+          <div class="legend"><span style="color:var(--cyan)"><i class="sw" style="height:8px"></i>부적합</span><span style="color:var(--red)"><i class="sw"></i>합격률</span></div>
+        </div>
+        <div class="chart-scroll"><svg id="q1" viewBox="0 0 640 360" role="img" aria-label="주간 품질 부적합 건수와 검측 합격률"></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">층별 결함 밀도</span><span class="eyebrow" style="color:var(--dim)">건 / 100㎡</span></div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:10px" id="qfl">${FLOORS.slice().reverse().map(f => {
+          const crit = f.f === "3F";
+          return `<div style="display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><b style="font-family:var(--f-display);font-size:20px;${crit ? "color:var(--red)" : ""}">${f.f}</b><span style="font-family:var(--f-mono);font-size:12px;color:var(--muted)">${f.n}건 · ${f.area.toLocaleString("ko-KR")}㎡${crit ? " (타설 40%)" : ""}</span></div>
+            <div style="display:grid;grid-template-columns:1fr 54px;gap:10px;align-items:center"><div class="track" style="height:12px"><i data-w="${(f.d / FLOORS[3].d * 100).toFixed(1)}" style="background:${crit ? "var(--red)" : "var(--cyan)"}"></i></div><span style="font-family:var(--f-mono);font-size:14px;font-weight:600;text-align:right;${crit ? "color:var(--red)" : ""}">${f.d.toFixed(2)}</span></div>
+            ${crit ? `<small style="color:var(--red);font-size:12px">레미콘 재개 이후 타설된 유일한 층</small>` : ""}
+          </div>`; }).join("")}</div>
+      </div>
+    </div>`;
+  requestAnimationFrame(() => requestAnimationFrame(() => body.querySelectorAll("#qfl .track i").forEach(i => { i.style.width = i.dataset.w + "%"; })));
+  const svg = $("q1"), W = 640, H = 360, L = 40, Rr = 44, T = 30, B = 40, bw = (W - L - Rr) / NOW_W;
+  const ys = v => T + (1 - v / 30) * (H - T - B), yp = v => T + (1 - (v - 50) / 50) * (H - T - B);
+  [0, 10, 20, 30].forEach(v => { el("line", { x1:L, x2:W - Rr, y1:ys(v), y2:ys(v), class:"gridl" }, svg); tx(svg, L - 8, ys(v) + 4, v, { class:"ax", "text-anchor":"end" }); });
+  [50, 75, 100].forEach(v => tx(svg, W - Rr + 6, yp(v) + 4, v + "%", { class:"ax", fill:"#d6334a" }));
+  el("rect", { x:L + 15 * bw, y:T - 22, width:6 * bw, height:H - B - T + 22, fill:"rgba(214,51,74,.06)" }, svg);
+  tx(svg, L + 15 * bw + 5, T - 9, "W16~ 레미콘 B사 · 현장가공 · 신규 인력", { "font-size":11, fill:"#d6334a", "font-weight":600 });
+  Q_W.forEach((v, i) => {
+    const x = L + i * bw + bw * .2, w = bw * .6;
+    const r = el("rect", { x, y:ys(v), width:w, height:ys(0) - ys(v), fill:"#0b72c4", "fill-opacity":i >= 15 ? .85 : .4 }, svg);
+    if (!reduced){ r.style.transformOrigin = `0 ${ys(0)}px`; r.style.transform = "scaleY(0)"; r.style.transition = `transform .5s cubic-bezier(.3,0,.2,1) ${i * 0.03}s`; requestAnimationFrame(() => requestAnimationFrame(() => { r.style.transform = "scaleY(1)"; })); }
+    if ((i + 1) % 2 === 1) tx(svg, x + w / 2, H - B + 18, "W" + (i + 1), { class:"ax", "text-anchor":"middle" });
+  });
+  const pp = Q_PASS.map((v, i) => [L + i * bw + bw / 2, yp(v)]);
+  const path = el("path", { d:pts(pp), fill:"none", stroke:"#d6334a", "stroke-width":2.2, "stroke-linejoin":"round" }, svg);
+  pp.forEach((p, i) => { el("circle", { cx:p[0], cy:p[1], r:2.6, fill:"#d6334a" }, svg); if (Q_PASS[i] === Q_PASS_MIN) tx(svg, p[0], p[1] + 18, Q_PASS_MIN + "%", { "text-anchor":"middle", "font-size":12, fill:"#d6334a", "font-weight":600 }); });
+  drawIn(path, 0.3);
+  return null;
+}
+
+function qualityPareto(){
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">결함 유형 파레토 · ${Q_N}건</span>
+        <div class="legend"><span style="color:var(--red)"><i class="sw" style="height:8px"></i>상위 3유형</span><span style="color:var(--cyan)"><i class="sw" style="height:8px"></i>기타 유형</span><span style="color:var(--fg)"><i class="sw"></i>누적 비율</span></div>
+      </div>
+      <div class="chart-scroll"><svg id="q2" viewBox="0 0 1000 340" role="img" aria-label="결함 유형별 파레토 차트"></svg></div>
+    </div>
+    <div class="ev-grid">
+      <div class="ev key"><div class="top"><span class="eyebrow">상위 3유형 비중</span><span class="chip crit">핵심</span></div><div class="r">${Math.round(Q_TOP3 * 100)}%</div><p>균열 · 콜드조인트 · 피복 부족, 세 유형이 결함의 대부분입니다.</p></div>
+      <div class="ev"><div class="top"><span class="eyebrow">공통 분모</span><span class="chip warn">골조</span></div><div class="r" style="color:var(--amber)">콘크리트 · 철근</div><p>셋 다 타설과 배근 단계에서 생기는 결함입니다.</p></div>
+      <div class="ev"><div class="top"><span class="eyebrow">마감 · 설비 결함</span><span class="chip ok">알리바이</span></div><div class="r">${Math.round((Q_TYPES[5].n + Q_TYPES[6].n) / Q_N * 100)}%</div><p>레벨 불량, 매립물 누락은 평소 수준입니다.</p></div>
+    </div>`;
+  const svg = $("q2"), W = 1000, H = 340, L = 50, Rr = 54, T = 34, B = 46, n = Q_TYPES.length, bw = (W - L - Rr) / n;
+  const ymax = 60, ys = v => T + (1 - v / ymax) * (H - T - B), yc = v => T + (1 - v) * (H - T - B);
+  [0, 20, 40, 60].forEach(v => { el("line", { x1:L, x2:W - Rr, y1:ys(v), y2:ys(v), class:"gridl" }, svg); tx(svg, L - 8, ys(v) + 4, v, { class:"ax", "text-anchor":"end" }); });
+  [0, .5, 1].forEach(v => tx(svg, W - Rr + 8, yc(v) + 4, Math.round(v * 100) + "%", { class:"ax" }));
+  el("line", { x1:L, x2:W - Rr, y1:yc(.8), y2:yc(.8), stroke:"#d97706", "stroke-dasharray":"5 5" }, svg);
+  tx(svg, W - Rr - 4, yc(.8) - 6, "80% 기준", { class:"ax", fill:"#d97706", "text-anchor":"end" });
+  let cum = 0; const cp = [];
+  Q_TYPES.forEach((t, i) => {
+    const x = L + i * bw + bw * .16, w = bw * .68, top = i < 3;
+    const r = el("rect", { x, y:ys(t.n), width:w, height:ys(0) - ys(t.n), fill: top ? "#d6334a" : "#0b72c4", "fill-opacity": top ? .85 : .4 }, svg);
+    if (!reduced){ r.style.transformOrigin = `0 ${ys(0)}px`; r.style.transform = "scaleY(0)"; r.style.transition = `transform .55s cubic-bezier(.3,0,.2,1) ${i * 0.08}s`; requestAnimationFrame(() => requestAnimationFrame(() => { r.style.transform = "scaleY(1)"; })); }
+    tx(svg, x + w / 2, ys(t.n) - 7, t.n, { "text-anchor":"middle", "font-size":13, fill: top ? "#d6334a" : "#0b72c4", "font-weight":600 });
+    tx(svg, x + w / 2, H - B + 20, t.name, { "text-anchor":"middle", "font-size":13, fill:"#0f1d33", "font-family":"IBM Plex Sans KR, sans-serif" });
+    cum += t.n; cp.push([x + w / 2, yc(cum / Q_N)]);
+  });
+  const path = el("path", { d:pts(cp), fill:"none", stroke:"#0f1d33", "stroke-width":2 }, svg);
+  cp.forEach((p, i) => { el("circle", { cx:p[0], cy:p[1], r:3.5, fill:"#ffffff", stroke:"#0f1d33", "stroke-width":2 }, svg); if (i === 2) tx(svg, p[0] + 10, p[1] + 16, Math.round(Q_TOP3 * 100) + "%", { "font-size":13, fill:"#0f1d33", "font-weight":700 }); });
+  drawIn(path, 0.6);
+  const g = el("g", { class:"fade-in", style:"animation-delay:.9s" }, svg);
+  el("rect", { x:L + 4, y:T - 26, width:bw * 3 - 8, height:H - B - T + 26, fill:"none", stroke:"#d6334a", "stroke-width":2, "stroke-dasharray":"6 4" }, g);
+  tx(g, L + 12, T - 10, "골조 결함 · 콘크리트와 철근", { "font-size":12, fill:"#d6334a", "font-weight":600 });
+  return null;
+}
+
+function qualityPlan(){
+  body.innerHTML = `
+    <div class="s1-grid">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">3F 슬래브 평면 · 결함 ${FLOORS[3].n}건</span>
+          <div class="legend"><span style="color:var(--red)">━ 콜드조인트</span><span style="color:var(--amber)">╱ 균열</span><span style="color:var(--cyan)">● 피복 부족</span><span style="color:var(--muted)">■ 허니콤 · 기타</span></div>
+        </div>
+        <div class="chart-scroll"><svg id="q3" viewBox="0 0 640 420" role="img" aria-label="3층 슬래브 평면 위 결함 위치"></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">타설 구획별 대조</span></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="ev key"><div class="top"><span class="eyebrow">3F-A · 10.09 타설</span><span class="chip crit">주범 구역</span></div><div class="r">${Q3.A}건</div><p>레미콘 재개 첫날 · B사 첫 출하분 · 대체 형틀팀 투입 1주차</p></div>
+          <div class="ev" style="border-color:var(--red)"><div class="top"><span class="eyebrow">X3열 타설 이음부</span><span class="chip crit">콜드조인트</span></div><div class="r" style="color:var(--red)">${Q3.J}건</div><p>연속 타설 계획이었지만 11일간 끊겨 이음부가 생겼습니다.</p></div>
+          <div class="ev"><div class="top"><span class="eyebrow">3F-B · 10.20 타설</span><span class="chip warn">연쇄 피해</span></div><div class="r" style="color:var(--amber)">${Q3.B}건</div><p>현장가공 철근 구간 · 피복 부족이 집중됩니다.</p></div>
+        </div>
+      </div>
+    </div>`;
+  const svg = $("q3"), R3 = rng(4242), X0 = 60, Y0 = 64, BX = 74, BY = 72, NX = 7, NY = 4;
+  const gx = i => X0 + i * BX, gy = j => Y0 + j * BY;
+  el("rect", { x:0, y:0, width:640, height:420, fill:"#fbfcfe" }, svg);
+  // unpoured
+  const pat = el("pattern", { id:"hatch", width:8, height:8, patternUnits:"userSpaceOnUse", patternTransform:"rotate(45)" }, el("defs", null, svg));
+  el("line", { x1:0, y1:0, x2:0, y2:8, stroke:"#c4cfdd", "stroke-width":2 }, pat);
+  el("rect", { x:gx(3), y:gy(0), width:BX * 4, height:BY * 4, fill:"url(#hatch)", opacity:.6 }, svg);
+  el("rect", { x:gx(5) - 48, y:gy(2) - 14, width:96, height:26, fill:"#fbfcfe" }, svg);
+  tx(svg, gx(5), gy(2) + 5, "미타설 (60%)", { "text-anchor":"middle", "font-size":13, fill:"#5b6b84", "font-family":"IBM Plex Sans KR, sans-serif", "font-weight":600 });
+  el("rect", { x:gx(0), y:gy(0), width:BX * 2, height:BY * 4, fill:"rgba(214,51,74,.08)" }, svg);
+  el("rect", { x:gx(2), y:gy(0), width:BX, height:BY * 4, fill:"rgba(217,119,6,.08)" }, svg);
+  for (let i = 0; i <= NX; i++){ el("line", { x1:gx(i), x2:gx(i), y1:gy(0) - 18, y2:gy(NY) + 6, stroke:"#94a1b5", "stroke-dasharray":"6 3 1 3" }, svg); el("circle", { cx:gx(i), cy:gy(0) - 30, r:11, fill:"#ffffff", stroke:"#5b6b84" }, svg); tx(svg, gx(i), gy(0) - 26, "X" + (i + 1), { "text-anchor":"middle", "font-size":10.5, fill:"#0f1d33" }); }
+  for (let j = 0; j <= NY; j++){ el("line", { x1:gx(0) - 18, x2:gx(NX) + 6, y1:gy(j), y2:gy(j), stroke:"#94a1b5", "stroke-dasharray":"6 3 1 3" }, svg); el("circle", { cx:gx(0) - 30, cy:gy(j), r:11, fill:"#ffffff", stroke:"#5b6b84" }, svg); tx(svg, gx(0) - 30, gy(j) + 4, "Y" + (j + 1), { "text-anchor":"middle", "font-size":10.5, fill:"#0f1d33" }); }
+  for (let i = 0; i <= NX; i++) for (let j = 0; j <= NY; j++) el("rect", { x:gx(i) - 5, y:gy(j) - 5, width:10, height:10, fill:"#0f1d33" }, svg);
+  el("rect", { x:gx(0), y:gy(0), width:BX * NX, height:BY * NY, fill:"none", stroke:"#0f1d33", "stroke-width":2 }, svg);
+  tx(svg, gx(1), gy(NY) + 30, "3F-A · 10.09 타설 · B사", { "text-anchor":"middle", "font-size":12, fill:"#d6334a", "font-weight":600, "font-family":"IBM Plex Sans KR, sans-serif" });
+  tx(svg, gx(2) + BX / 2 + 14, gy(NY) + 48, "3F-B · 10.20", { "text-anchor":"middle", "font-size":12, fill:"#d97706", "font-weight":600, "font-family":"IBM Plex Sans KR, sans-serif" });
+  const marks = el("g", null, svg);
+  const put = (kind, x, y, k) => {
+    let m;
+    if (kind === "crack"){ const a = R3() * Math.PI, l = 7 + R3() * 6; m = el("path", { d:`M${x - Math.cos(a) * l} ${y - Math.sin(a) * l} l${Math.cos(a) * l * .7} ${Math.sin(a) * l * .7 + 3} L${x + Math.cos(a) * l} ${y + Math.sin(a) * l}`, fill:"none", stroke:"#d97706", "stroke-width":2 }, marks); }
+    else if (kind === "cover") m = el("circle", { cx:x, cy:y, r:4.5, fill:"#0b72c4", "fill-opacity":.85 }, marks);
+    else m = el("rect", { x:x - 4, y:y - 4, width:8, height:8, fill:"#5b6b84", "fill-opacity":.75 }, marks);
+    if (!reduced){ m.style.opacity = 0; m.style.transition = `opacity .25s ease ${0.3 + k * 0.012}s`; requestAnimationFrame(() => requestAnimationFrame(() => { m.style.opacity = 1; })); }
+  };
+  const inZone = (x0, x1) => [x0 + 8 + R3() * (x1 - x0 - 16), gy(0) + 8 + R3() * (BY * 4 - 16)];
+  const onBeam = (x0, x1) => { const j = Math.floor(R3() * (NY + 1)); return [x0 + 10 + R3() * (x1 - x0 - 20), gy(j) + (R3() - .5) * 8]; };
+  const nearCol = (i0, i1) => { const i = i0 + Math.floor(R3() * (i1 - i0 + 1)), j = Math.floor(R3() * (NY + 1)); return [gx(i) + (R3() - .5) * 18, gy(j) + (R3() - .5) * 18]; };
+  let k = 0;
+  const zoneMix = (cnt, x0, x1, i0, i1, mix) => {
+    const kinds = [];
+    Object.entries(mix).forEach(([kk, v]) => { for (let q = 0; q < v; q++) kinds.push(kk); });
+    for (let q = 0; q < cnt; q++){
+      const kind = kinds[q] || "etc";
+      const [x, y] = kind === "cover" ? onBeam(x0, x1) : kind === "honey" ? nearCol(i0, i1) : inZone(x0, x1);
+      put(kind === "crack" ? "crack" : kind === "cover" ? "cover" : "etc", x, y, k++);
+    }
+  };
+  zoneMix(Q3.A, gx(0), gx(2) - 6, 0, 2, { crack:20, cover:10, honey:7, etc:7 });
+  zoneMix(Q3.B, gx(2) + 6, gx(3), 2, 3, { crack:9, cover:10, honey:2, etc:2 });
+  const joint = el("line", { x1:gx(2), x2:gx(2), y1:gy(0), y2:gy(NY), stroke:"#d6334a", "stroke-width":5, "stroke-linecap":"round" }, svg);
+  drawIn(joint, 0.2);
+  for (let q = 0; q < Q3.J; q++){ const y = gy(0) + 10 + (q + .5) / Q3.J * (BY * 4 - 20); el("path", { d:`M${gx(2) - 9} ${y}h18`, stroke:"#d6334a", "stroke-width":2 }, marks); }
+  const lb = el("g", { class:"fade-in", style:"animation-delay:1s" }, svg);
+  el("rect", { x:gx(2) - 66, y:gy(0) - 64, width:132, height:22, fill:"#d6334a" }, lb);
+  tx(lb, gx(2), gy(0) - 49, `콜드조인트 · ${Q3.J}건`, { "text-anchor":"middle", "font-size":12, fill:"#ffffff", "font-weight":600 });
+  return null;
+}
+
+function qualityStrength(){
+  const all = POURS_A.concat(POURS_B);
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">타설일별 공시체 28일 압축강도 · 설계기준강도 ${FCK}MPa</span>
+        <div class="legend"><span style="color:var(--cyan)">● 레미콘 A사</span><span style="color:var(--red)">● 레미콘 B사</span><span style="color:var(--muted)">○ 28일 결과 대기</span></div>
+      </div>
+      <div class="chart-scroll"><svg id="q4" viewBox="0 0 1000 340" role="img" aria-label="레미콘사별 압축강도 비교"></svg></div>
+    </div>
+    <div class="ev-grid">
+      <div class="ev"><div class="top"><span class="eyebrow">A사 평균 강도</span><span class="chip ok">여유 확보</span></div><div class="r" style="color:var(--cyan)">${AVG_A.toFixed(1)}MPa</div><p>설계기준강도보다 ${(AVG_A - FCK).toFixed(1)}MPa 높게 꾸준히 나왔습니다.</p></div>
+      <div class="ev key"><div class="top"><span class="eyebrow">B사 연속 3회 평균</span><span class="chip crit">판정 미달</span></div><div class="r">${AVG_B.toFixed(1)}MPa</div><p>연속 3회 평균이 ${FCK}MPa에 못 미칩니다. 3F-A 타설분이 최저 ${POURS_B[0].v}MPa입니다.</p></div>
+      <div class="ev"><div class="top"><span class="eyebrow">피복 부족 ${COVER_TOTAL}건 중</span><span class="chip warn">공범</span></div><div class="r" style="color:var(--amber)">${Math.round(COVER_SHARE * 100)}%</div><p>철근 대체 업체 현장가공 기간(W16–W19)에 몰렸습니다.</p></div>
+    </div>`;
+  const svg = $("q4"), W = 1000, H = 340, L = 54, Rr = 20, T = 34, B = 44;
+  const slot = (W - L - Rr - 60) / all.length, idx = d => all.findIndex(p => p.d === d);
+  const xs = d => { const i = idx(d); return L + 30 + (i + (i >= POURS_A.length ? 1 : 0)) * slot; }, ys = v => T + (1 - (v - 20) / 16) * (H - T - B);
+  [20, 24, 28, 32, 36].forEach(v => { el("line", { x1:L, x2:W - Rr, y1:ys(v), y2:ys(v), class:"gridl" }, svg); tx(svg, L - 8, ys(v) + 4, v, { class:"ax", "text-anchor":"end" }); });
+  tx(svg, L - 8, T - 14, "MPa", { class:"ax", "text-anchor":"end" });
+  el("rect", { x:xs(POURS_B[0].d) - 16, y:T - 22, width:xs(POURS_B[4].d) - xs(POURS_B[0].d) + 32, height:H - B - T + 22, fill:"rgba(214,51,74,.06)" }, svg);
+  tx(svg, xs(POURS_B[0].d) - 10, T - 9, "레미콘 B사 긴급 공급", { "font-size":11.5, fill:"#d6334a", "font-weight":600 });
+  [[FCK, `설계기준강도 ${FCK}`, "#0f1d33", ""], [FCK - 3.5, `1회 하한 ${FCK - 3.5}`, "#94a1b5", "4 4"]].forEach(([v, lab, c, da]) => {
+    el("line", { x1:L, x2:W - Rr, y1:ys(v), y2:ys(v), stroke:c, "stroke-width":1.5, "stroke-dasharray":da }, svg);
+    tx(svg, L + 6, ys(v) - 6, lab, { class:"ax", fill:c });
+  });
+  POURS_A.forEach((p, i) => { if (i % 3 === 0) tx(svg, xs(p.d), H - B + 18, md(p.d), { class:"ax", "text-anchor":"middle" }); });
+  POURS_B.forEach(p => tx(svg, xs(p.d), H - B + 18, md(p.d), { class:"ax", "text-anchor":"middle", fill:"#d6334a" }));
+  const ap = POURS_A.map(p => [xs(p.d), ys(p.v)]);
+  el("path", { d:pts(ap), fill:"none", stroke:"#0b72c4", "stroke-opacity":.35, "stroke-width":1.5 }, svg);
+  POURS_A.forEach((p, i) => { const c = el("circle", { cx:xs(p.d), cy:ys(p.v), r:5, fill:"#0b72c4", class:"fade-in", style:`animation-delay:${i * 0.04}s` }, svg); });
+  const bp = B_CONF.map(p => [xs(p.d), ys(p.v)]);
+  el("path", { d:pts(bp), fill:"none", stroke:"#d6334a", "stroke-opacity":.4, "stroke-width":1.5 }, svg);
+  POURS_B.forEach((p, i) => {
+    const g = el("g", { class:"fade-in", style:`animation-delay:${0.6 + i * 0.12}s` }, svg);
+    el("circle", { cx:xs(p.d), cy:ys(p.v), r:6, fill:p.ok ? "#d6334a" : "#ffffff", stroke:p.ok ? "#d6334a" : "#94a1b5", "stroke-width":2 }, g);
+    tx(g, xs(p.d), ys(p.v) + (p.ok ? 22 : -12), p.v.toFixed(1) + (p.tag ? " · " + p.tag : ""), { "text-anchor":"middle", "font-size":11.5, fill:p.ok ? "#d6334a" : "#5b6b84", "font-weight":600 });
+  });
+  const ay = ys(AVG_B), g2 = el("g", { class:"fade-in", style:"animation-delay:1.2s" }, svg);
+  el("line", { x1:xs(B_CONF[0].d) - 8, x2:xs(B_CONF[2].d) + 8, y1:ay, y2:ay, stroke:"#d6334a", "stroke-width":2.5 }, g2);
+  tx(g2, xs(B_CONF[0].d) - 16, ay + 4, `연속 3회 평균 ${AVG_B.toFixed(1)} →`, { "font-size":12, fill:"#d6334a", "font-weight":700, "text-anchor":"end" });
+  return null;
+}
+
+function qualityAction(){
+  const keys = Object.keys(Q_ITEMS);
+  body.innerHTML = `
+    <div class="sim">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">지금 조치할 항목</span></div>
+        ${keys.map((k, i) => { const q = Q_ITEMS[k]; return `
+        <div class="ctl"${i === keys.length - 1 ? ' style="border-bottom:0"' : ""}>
+          <label class="tg" for="q_${k}"><span class="ctl-head" style="flex:1"><b>${q.label}</b><span>지금 ${q.now.toFixed(2)}억</span></span><input type="checkbox" id="q_${k}"><span class="sl"></span></label>
+          <p>${q.note}</p>
+        </div>`; }).join("")}
+        <div class="sim-actions">
+          <button class="btn" type="button" id="qAll">전체 조치</button>
+          <button class="btn" type="button" id="qReset">초기화</button>
+        </div>
+      </div>
+      <div class="panel result">
+        <div class="panel-head" style="margin:0"><span class="eyebrow">총 품질 리스크 (지금 비용 + 나중 하자 기대비용)</span></div>
+        <div class="fc"><div class="date" id="qVal">—</div><span class="chip" id="qChip">—</span></div>
+        <svg id="q5" class="tl" viewBox="0 0 560 200" role="img" aria-label="조치 전후 품질 리스크 비교"></svg>
+        <div class="ledger">
+          <div>지금 들어가는 조치 비용</div><div id="qNow">—</div>
+          <div>준공 후 하자 기대비용</div><div id="qLater">—</div>
+          <div class="tot">아무것도 안 할 때 대비</div><div class="tot" id="qSave">—</div>
+        </div>
+        <div class="hint" id="qHint"></div>
+      </div>
+    </div>`;
+  const svg = $("q5"), W = 560, L = 96, Rr = 70, vmax = 6;
+  const xv = v => L + v / vmax * (W - L - Rr);
+  function update(){
+    let now = 0, later = 0;
+    keys.forEach(k => { const q = Q_ITEMS[k], on = $("q_" + k).checked; if (on){ now += q.now; later += q.after; } else later += q.later; });
+    const total = now + later;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    [0, 2, 4, 6].forEach(v => { el("line", { x1:xv(v), x2:xv(v), y1:14, y2:150, class:"gridl" }, svg); tx(svg, xv(v), 168, v + "억", { class:"ax", "text-anchor":"middle" }); });
+    const rows = [{ lab:"조치 없음", now:0, later:Q_BASE }, { lab:"현재 조합", now, later }];
+    rows.forEach((r, i) => {
+      const y = 30 + i * 62;
+      tx(svg, 8, y + 20, r.lab, { "font-size":13, fill:"#0f1d33", "font-family":"IBM Plex Sans KR, sans-serif", "font-weight":600 });
+      if (r.now > 0) el("rect", { x:xv(0), y, width:xv(r.now) - xv(0), height:30, fill:"#0b72c4" }, svg);
+      el("rect", { x:xv(r.now), y, width:Math.max(0, xv(r.now + r.later) - xv(r.now)), height:30, fill:"#d6334a", "fill-opacity":.8 }, svg);
+      tx(svg, xv(r.now + r.later) + 6, y + 20, (r.now + r.later).toFixed(2) + "억", { "font-size":13, fill:"#0f1d33", "font-weight":700 });
+    });
+    el("rect", { x:L, y:184, width:10, height:10, fill:"#0b72c4" }, svg); tx(svg, L + 14, 193, "지금 조치 비용", { "font-size":11.5, fill:"#5b6b84", "font-family":"IBM Plex Sans KR, sans-serif" });
+    el("rect", { x:L + 120, y:184, width:10, height:10, fill:"#d6334a", "fill-opacity":.8 }, svg); tx(svg, L + 134, 193, "준공 후 하자 기대비용", { "font-size":11.5, fill:"#5b6b84", "font-family":"IBM Plex Sans KR, sans-serif" });
+    $("qVal").textContent = total.toFixed(2) + "억 원";
+    const sv = Q_BASE - total;
+    $("qVal").style.color = sv > 0.01 ? "var(--green)" : "var(--red)";
+    const chip = $("qChip");
+    chip.className = "chip " + (sv > 0.01 ? "ok" : "crit");
+    chip.textContent = sv > 0.01 ? `리스크 −${Math.round(sv / Q_BASE * 100)}%` : "조치 전";
+    $("qNow").textContent = now.toFixed(2) + "억";
+    $("qLater").textContent = later.toFixed(2) + "억";
+    $("qSave").textContent = sv > 0.01 ? "−" + sv.toFixed(2) + "억 절감" : "변화 없음";
+    $("qSave").style.color = sv > 0.01 ? "var(--green)" : "";
+    const roi = keys.map(k => ({ k, r:(Q_ITEMS[k].later - Q_ITEMS[k].after) / Q_ITEMS[k].now })).sort((a, b) => b.r - a.r)[0];
+    $("qHint").innerHTML = `가장 효율이 높은 한 수는 <b style="color:var(--fg)">${Q_ITEMS[roi.k].label}</b>입니다. 1원을 쓰면 ${roi.r.toFixed(1)}원의 하자 비용을 막습니다.`;
+  }
+  keys.forEach(k => $("q_" + k).addEventListener("change", update));
+  $("qAll").addEventListener("click", () => { keys.forEach(k => { $("q_" + k).checked = true; }); update(); });
+  $("qReset").addEventListener("click", () => { keys.forEach(k => { $("q_" + k).checked = false; }); update(); });
+  update();
+  return null;
+}
+
+const SCENES_D = [
+  { label:"사건 개요", title:"품질 이상 감지", meta:`기준일 ${ymd(BASE_DATE)} · 부적합 보고 ${Q_N}건`, scan:"품질 검측 기록 로드 중", render:qualityOverview,
+    say:`소장님, 마지막은 품질이에요. 품질 부적합 ${Q_N}건 중 [[${Q_LATE}건]]이 16주차 이후에 났어요. 검측 1회 합격률도 90%대에서 [[${Q_PASS_MIN}%]]까지 떨어졌고요. 층별로 보면 3층의 면적당 결함이 다른 층 평균의 [[${Q_DENS_X.toFixed(1)}배]]예요. 3층은 레미콘 재개 이후에 친 유일한 층이에요.`,
+    log:`부적합 ${Q_N}건 · 3F 결함 밀도 ${Q_DENS_X.toFixed(1)}배` },
+  { label:"유형 분석", title:"결함 유형 파레토", meta:`유형 ${Q_TYPES.length}개 · 누적 비율`, scan:"결함 유형 분류 중", render:qualityPareto,
+    say:`결함 유형을 많은 순서대로 세워 봤어요. 균열, 콜드조인트, 피복 부족, 이 세 가지가 [[${Math.round(Q_TOP3 * 100)}%]]예요. 셋 다 마감이나 설비가 아니라 [[골조]], 그중에서도 콘크리트와 철근 문제예요.`,
+    log:`상위 3유형 ${Math.round(Q_TOP3 * 100)}% · 모두 골조` },
+  { label:"위치 추적", title:"3층 평면 결함 매핑", meta:`3F 슬래브 · 그리드 X1–X8 / Y1–Y5`, scan:"평면 좌표 매핑 중", render:qualityPlan,
+    say:`3층 평면에 결함을 찍어 보면 패턴이 보여요. 3F-A 구역은 [[10월 9일, 레미콘 재개 첫날]] 친 구역이고, 3F-B는 11일 뒤에야 이어서 쳤어요. 원래 연속 타설 계획이었는데 중간에 끊기면서 X3열에 [[콜드조인트]]가 생겼어요.`,
+    log:`3F-A 재개 첫날 타설 · X3열 콜드조인트 ${Q3.J}건` },
+  { label:"강도 대조", title:"결정적 증거 · 압축강도", meta:`공시체 ${POURS_A.length + POURS_B.length}회 · A사 / B사 비교`, scan:"공시체 시험 성적 대조 중", render:qualityStrength,
+    say:`공시체 압축강도를 레미콘사별로 대조했어요. 원래 A사는 평균 ${AVG_A.toFixed(1)}MPa로 여유가 있었어요. 그런데 재개 후 긴급 투입한 [[B사는 연속 3회 평균 ${AVG_B.toFixed(1)}MPa]]로, 설계기준강도 ${FCK}MPa에 못 미쳐요. 피복 부족도 ${Math.round(COVER_SHARE * 100)}%가 철근 현장가공 기간에 몰려 있어요. 결국 품질 하자도 [[같은 사건의 연장선]]이에요.`,
+    log:`B사 3회 평균 ${AVG_B.toFixed(1)}MPa < ${FCK} · 피복 부족 ${Math.round(COVER_SHARE * 100)}%` },
+  { label:"조치 판단", title:"지금 고칠까, 나중에 고칠까", meta:`조치 4개 · 하자 기대비용 비교`, scan:"하자 비용 시나리오 계산 중", render:qualityAction,
+    say:`품질 하자는 지금 고치면 싸고, 준공 후에 터지면 비싸요. 그대로 두면 예상 품질 리스크가 [[${Q_BASE.toFixed(2)}억]]이에요. 그중 3F-A는 코어를 뽑아 강도를 먼저 확인하는 게 첫 단추예요. 재시공이냐 보강이냐를 [[데이터로 판정]]할 수 있거든요. 대책을 켜 보시면 지금 비용과 나중 비용을 같이 계산해 드릴게요.`,
+    log:`품질 리스크 ${Q_BASE.toFixed(2)}억 · 조기 조치 판단` }
+];
+
 /* ======================== CONTROLLER ======================== */
 const CASES = {
   schedule: { no:"SFL-26-1115-A", sub:"공정 지연 수사", scenes:SCENES },
   cost:     { no:"SFL-26-1115-B", sub:"원가 초과 수사", scenes:SCENES_B },
-  safety:   { no:"SFL-26-1115-C", sub:"안전 사고 수사", scenes:SCENES_C }
+  safety:   { no:"SFL-26-1115-C", sub:"안전 사고 수사", scenes:SCENES_C },
+  quality:  { no:"SFL-26-1115-D", sub:"품질 하자 수사", scenes:SCENES_D }
 };
 let caseId = "schedule", SC = SCENES;
 let cur = -1, typing = null, autoTimer = null, auto = false, busy = false;
-const visitedBy = { schedule:new Set(), cost:new Set(), safety:new Set() };
+const visitedBy = { schedule:new Set(), cost:new Set(), safety:new Set(), quality:new Set() };
 const stepList = $("stepList");
 function buildSteps(){
   stepList.innerHTML = SC.map((s, i) => `<button class="step" type="button" data-i="${i}"><span class="n">${String(i + 1).padStart(2, "0")}</span><span class="l">${s.label}</span></button>`).join("");
@@ -1823,7 +2141,7 @@ function render(i){
   $("sceneStep").textContent = `STEP ${String(i + 1).padStart(2, "0")} / ${String(SC.length).padStart(2, "0")}`;
   $("sceneTitle").textContent = s.title;
   $("sceneMark").textContent = i + 1;
-  $("wm").textContent = caseId === "schedule" ? "A" : caseId === "cost" ? "B" : "C";
+  $("wm").textContent = { schedule:"A", cost:"B", safety:"C", quality:"D" }[caseId];
   $("sceneMeta").textContent = s.meta;
   body.scrollTop = 0;
   cleanup = s.render() || null;
