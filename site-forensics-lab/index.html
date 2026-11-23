@@ -50,7 +50,7 @@ body{
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 
-.app{height:100%;max-width:1640px;margin:0 auto;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:12px}
+.app{height:100%;max-width:1640px;margin:0 auto;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:10px}
 
 /* ---------- top bar ---------- */
 .topbar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:4px 2px}
@@ -359,6 +359,185 @@ svg text{font-family:var(--f-mono)}
 @media (max-width:980px){ .bill{grid-template-columns:minmax(0,1fr)} }
 @media (max-width:640px){ .pkg-row{grid-template-columns:30px minmax(0,1fr) auto} .pkg-row .from{display:none} .bill-num{font-size:48px} }
 
+
+/* ---------- case rail ---------- */
+.rail{display:flex;gap:10px;align-items:center;overflow-x:auto;scrollbar-width:thin;padding:2px 2px 4px}
+.rail-group{display:flex;align-items:center;gap:8px;flex:none}
+.rail-label{font-family:var(--f-mono);font-size:10px;letter-spacing:.16em;color:var(--dim);white-space:nowrap}
+.rail-tabs{display:flex;border:1px solid var(--line-2);background:#ffffff}
+.case-tab{display:flex;align-items:center;gap:6px;background:#ffffff;border:0;border-right:1px solid var(--line);padding:6px 10px 6px 7px;min-height:42px;cursor:pointer;font-size:12.5px;font-weight:500;color:var(--muted);white-space:nowrap;transition:background .2s,color .2s}
+.case-tab:last-child{border-right:0}
+.case-tab:hover{color:var(--fg);background:var(--panel-2)}
+.case-tab .tl{display:grid;place-items:center;width:24px;height:21px;padding-top:3px;font-family:var(--f-display);font-weight:700;font-size:12px;background:#e6ebf2;color:var(--muted);clip-path:polygon(18% 0,82% 0,100% 100%,0 100%)}
+.case-tab[aria-selected="true"]{background:var(--panel-2);color:var(--fg);box-shadow:inset 0 -3px 0 var(--amber)}
+.case-tab[aria-selected="true"] .tl{background:var(--tape);color:var(--fg)}
+.rg-board .case-tab{background:var(--fg);color:#ffffff}
+.rg-board .case-tab .tl{background:var(--tape);color:var(--fg)}
+.rg-board .case-tab[aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--tape)}
+.rg-tool .case-tab .tl{border-radius:50%;clip-path:none;width:22px;height:22px;padding:0;background:#e3eefa;color:var(--cyan);font-size:11px}
+.rg-tool .case-tab[aria-selected="true"] .tl{background:var(--cyan);color:#ffffff}
+@media (max-width:1500px){ .rail-label{display:none} }
+
+/* ---------- case F: lineup ---------- */
+.lineup-wrap{overflow-x:auto}
+.lineup{position:relative;min-width:760px;display:flex;gap:10px;padding:14px 10px 0 52px;background:linear-gradient(#fbfcfe,#f1f4f9);border:1px solid var(--line)}
+.lu-scale{position:absolute;left:0;right:0;top:14px;height:270px;pointer-events:none}
+.lu-scale span{position:absolute;left:0;right:0;border-top:1px solid rgba(15,29,51,.10);font-family:var(--f-mono);font-size:11px;color:var(--dim);padding-left:10px;line-height:0}
+.lu-scale span::before{content:"";position:absolute;left:0;width:30px;border-top:2px solid rgba(15,29,51,.35);top:-1px}
+.lu-p{flex:1;min-width:0;display:flex;flex-direction:column}
+.lu-body{position:relative;height:270px}
+.lu-body::before{content:"";position:absolute;left:24%;right:24%;bottom:0;height:var(--h);background:linear-gradient(180deg,#aeb9c9,#8c99ad);border-radius:30px 30px 0 0;transform-origin:bottom;animation:luGrow .9s cubic-bezier(.3,0,.2,1) var(--d) both}
+.lu-head{position:absolute;left:50%;bottom:calc(var(--h) + 6px);width:40px;height:40px;margin-left:-20px;border-radius:50%;background:#8c99ad;animation:fadeIn .5s ease calc(var(--d) + .6s) both}
+.lu-p.hot .lu-body::before{background:linear-gradient(180deg,#e0566a,#b0202f)}
+.lu-p.hot .lu-head{background:#b0202f}
+@keyframes luGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.lu-plate{background:var(--fg);color:#ffffff;margin:0 2px 10px;padding:8px 8px 9px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:1px}
+.lu-plate b{font-family:var(--f-display);font-size:20px;line-height:1;color:var(--tape)}
+.lu-plate span{font-size:13px;font-weight:600}
+.lu-plate small{font-size:10.5px;color:#c4cfdd}
+.lu-plate em{font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--tape);margin-top:2px}
+.lu-p.hot .lu-plate{background:var(--red)}
+.lu-p.hot .lu-plate b,.lu-p.hot .lu-plate em{color:#ffffff}
+.vpick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.vbtn{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;text-align:left;background:#ffffff;border:1px solid var(--line-2);padding:10px 12px;cursor:pointer;font:inherit;color:inherit;gap:0 10px}
+.vbtn b{font-size:14px;font-weight:600}
+.vbtn small{grid-column:1;font-size:11.5px;color:var(--muted)}
+.vbtn span{grid-column:2;grid-row:1/3;align-self:center;font-family:var(--f-display);font-weight:700;font-size:22px;color:var(--muted)}
+.vbtn:hover{border-color:var(--cyan)}
+.vbtn.on{border-color:var(--fg);background:var(--fg);color:#ffffff}
+.vbtn.on small,.vbtn.on span{color:var(--tape)}
+.rng{width:100%;accent-color:var(--cyan);height:24px}
+.grade{display:flex;flex-direction:column;gap:6px}
+.g-row{display:grid;grid-template-columns:22px 34px minmax(0,1.2fr) minmax(0,1fr) 44px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.g-rank{font-family:var(--f-mono);font-size:12px;color:var(--dim)}
+.g-badge{display:grid;place-items:center;width:32px;height:32px;background:var(--c);color:#ffffff;font-family:var(--f-display);font-weight:700;font-size:17px}
+.g-row b{display:block;font-size:13.5px;font-weight:600}
+.g-row small{display:block;font-size:11px;color:var(--muted)}
+.g-s{font-family:var(--f-mono);font-weight:600;font-size:13px;text-align:right}
+
+
+.pulse{transform-box:fill-box;transform-origin:center;animation:pulseRing 2.4s ease-out infinite;opacity:0}
+@keyframes pulseRing{0%{transform:scale(.6);opacity:.6}100%{transform:scale(1.05);opacity:0}}
+
+
+.hold-list{display:flex;flex-direction:column}
+.hold-row{display:grid;grid-template-columns:12px minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.hold-row i{width:12px;height:12px;display:block}
+.hold-row b{display:block;font-size:13.5px;font-weight:600}
+.hold-row small{display:block;font-size:11.5px;color:var(--muted)}
+.hold-row>span{font-family:var(--f-mono);font-weight:600;font-size:13px}
+.jump{background:#ffffff;border:1px solid var(--line-2);font:inherit;font-size:12px;font-weight:600;color:var(--cyan);padding:6px 10px;cursor:pointer;white-space:nowrap}
+.jump:hover{border-color:var(--cyan)}
+.jump-none{width:1px}
+
+
+/* ---------- tools ---------- */
+.watch-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.wh-sum{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.wh-n{display:grid;place-items:center;min-width:34px;height:34px;padding:0 6px;font-family:var(--f-display);font-weight:700;font-size:20px;color:#ffffff}
+.wh-n.r{background:var(--red)}.wh-n.a{background:var(--amber)}.wh-n.g{background:var(--green)}
+.watch-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.wt{background:#ffffff;border:1px solid var(--line);border-left:4px solid var(--green);padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.wt.lv1{border-left-color:var(--amber)}.wt.lv2{border-left-color:var(--red);background:linear-gradient(90deg,rgba(214,51,74,.06),#ffffff 60%)}
+.wt-top{display:flex;align-items:center;gap:8px}
+.wt-light{width:10px;height:10px;border-radius:50%;background:var(--green);flex:none}
+.wt.lv1 .wt-light{background:var(--amber)}
+.wt.lv2 .wt-light{background:var(--red);box-shadow:0 0 0 0 rgba(214,51,74,.5);animation:pulseDot 1.6s infinite}
+@keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(214,51,74,.5)}70%{box-shadow:0 0 0 8px rgba(214,51,74,0)}100%{box-shadow:0 0 0 0 rgba(214,51,74,0)}}
+.wt-k{font-size:12.5px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wt-cs{font-family:var(--f-display);font-weight:700;font-size:11px;background:var(--panel-2);border:1px solid var(--line-2);padding:0 5px}
+.wt-v{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1.15;font-variant-numeric:tabular-nums}
+.wt-v small{font-size:13px;color:var(--muted);margin-left:2px;font-weight:500}
+.wt.lv2 .wt-v{color:var(--red)}.wt.lv1 .wt-v{color:var(--amber)}
+.wt-sp{width:100%;height:38px;display:block}
+.wt-f{font-size:11px;color:var(--muted)}
+.watch-grid.compact .wt{padding:8px 10px}
+.watch-grid.compact .wt-v{font-size:22px}
+.pred{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pr{border:1px solid var(--line);border-top:3px solid var(--amber);padding:10px 12px}
+.pr.lv2{border-top-color:var(--red)}
+.pr b{font-family:var(--f-display);font-size:16px;display:block}
+.pr span{font-size:13.5px;font-weight:600;display:block;margin-top:2px}
+.pr p{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
+.replay{background:#ffffff;border:1px solid var(--line);padding:14px 16px;margin-bottom:12px;display:flex;flex-direction:column;gap:12px}
+.rp-ctl{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center}
+.rp-w{text-align:right}
+.rp-w b{display:block;font-family:var(--f-display);font-size:30px;line-height:1}
+.rp-w small{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.rp-cases{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+.rc{display:flex;flex-direction:column;align-items:flex-start;gap:1px;background:var(--panel-2);border:1px solid var(--line);padding:7px 9px;font:inherit;font-size:12px;color:var(--dim);cursor:default;text-align:left;transition:all .3s;min-width:0}
+.rc span{font-family:var(--f-display);font-weight:700;font-size:16px}
+.rc small{font-family:var(--f-mono);font-size:10.5px}
+.rc.on{background:#ffffff;border-color:var(--red);color:var(--fg);cursor:pointer}
+.rc.on span{color:var(--red)}
+.rc.now{background:var(--red);color:#ffffff;border-color:var(--red)}
+.rc.now span,.rc.now small{color:#ffffff}
+.rp-msg{font-size:14px;padding:10px 12px;background:var(--panel-2);border-left:3px solid var(--tape);min-height:44px}
+.dossier-wrap{display:grid;grid-template-columns:280px minmax(0,1fr);gap:14px;align-items:start}
+.dl{display:flex;flex-direction:column;gap:10px}
+.dq{width:100%;font:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--line-2);background:#ffffff;color:var(--fg)}
+.dq:focus-visible{outline:2px solid var(--cyan);outline-offset:0}
+.dchips{display:flex;flex-wrap:wrap;gap:6px}
+.dchip{font:inherit;font-size:12px;padding:4px 10px;border:1px solid var(--line-2);background:#ffffff;color:var(--muted);cursor:pointer}
+.dchip.on{background:var(--fg);color:#ffffff;border-color:var(--fg)}
+.dlist{display:flex;flex-direction:column;gap:4px;max-height:420px;overflow:auto}
+.ditem{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;gap:0 10px;text-align:left;background:#ffffff;border:1px solid var(--line);padding:8px 10px;cursor:pointer;font:inherit;color:inherit}
+.ditem .dt{grid-row:1/3;align-self:center;font-size:10.5px;font-family:var(--f-mono);color:var(--muted);border:1px solid var(--line-2);padding:1px 5px}
+.ditem b{font-size:13.5px;font-weight:600}
+.dl5{font-size:9px;letter-spacing:1px;color:var(--red)}
+.dl5 em{font-style:normal;color:#dbe2ec}
+.ditem:hover{border-color:var(--cyan)}
+.ditem.on{border-color:var(--fg);box-shadow:inset 4px 0 0 var(--tape)}
+.folder{position:relative;padding-top:26px}
+.f-tab{position:absolute;top:0;left:0;background:#e9d9a6;color:#5a4710;font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;padding:6px 16px 8px;clip-path:polygon(0 0,88% 0,100% 100%,0 100%)}
+.f-body{background:#f7efd6;border:1px solid #e2d3a2;padding:20px 22px;box-shadow:0 10px 24px rgba(15,29,51,.10);display:flex;flex-direction:column;gap:16px}
+.f-head{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:18px;align-items:start}
+.mug{position:relative;height:170px;background:#e7ecf3;border:6px solid #ffffff;box-shadow:0 4px 10px rgba(15,29,51,.15);display:grid;place-items:center;overflow:hidden;transform:rotate(-2deg)}
+.mug-scale{position:absolute;inset:0;background:repeating-linear-gradient(to top,transparent 0 17px,rgba(15,29,51,.18) 17px 18px)}
+.mug span{position:relative;font-family:var(--f-display);font-weight:700;font-size:44px;color:var(--fg)}
+.mug-plate{position:absolute;bottom:8px;left:8px;right:8px;background:var(--fg);color:#ffffff;font-family:var(--f-mono);font-size:10px;text-align:center;padding:3px 0}
+.f-id h3{margin:4px 0 2px;font-size:26px;font-weight:700}
+.f-id p{margin:0 0 10px;color:#6b5a28}
+.f-cases{display:flex;flex-wrap:wrap;gap:6px}
+.stamp{border:3px solid var(--red);color:var(--red);font-weight:800;font-size:16px;padding:6px 12px;transform:rotate(8deg);letter-spacing:.1em;opacity:.85;white-space:nowrap}
+.f-ev{width:100%;border-collapse:collapse;font-size:13.5px;background:#fffdf5}
+.f-ev th{text-align:left;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;color:#6b5a28;padding:8px 10px;border-bottom:1px solid #e2d3a2;font-weight:500}
+.f-ev td{padding:9px 10px;border-bottom:1px dashed #e2d3a2;vertical-align:middle}
+.f-ev td:first-child{width:52px}
+.f-verdict{border-left:3px solid var(--red);padding:4px 0 4px 12px}
+.f-verdict p{margin:4px 0 0;font-size:14.5px;font-weight:500}
+.subway-scroll{overflow-x:auto}
+.subway-scroll svg{display:block;width:100%;min-width:940px;height:auto}
+.stn{cursor:pointer;outline:none}
+.stn circle{transition:r .2s}
+.stn:hover circle,.stn:focus-visible circle,.stn.on circle{r:11;stroke-width:4.5}
+.stn.on text{font-weight:800}
+.st-detail{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;margin-top:12px;background:#ffffff;border:1px solid var(--line);padding:12px 16px}
+.st-badge{display:grid;place-items:center;width:38px;height:38px;color:#ffffff;font-family:var(--f-display);font-weight:700;font-size:18px}
+.st-detail b{display:block;font-size:16px;margin-top:2px}
+.st-detail p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.lessons{display:grid;grid-template-columns:260px minmax(0,1fr);gap:14px;align-items:start}
+.l-side{display:flex;flex-direction:column;gap:10px;position:sticky;top:0}
+.l-ring{width:100%;max-width:220px;align-self:center}
+.l-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.l-col{display:flex;flex-direction:column;gap:8px}
+.l-ph{font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;color:#ffffff;background:var(--fg);padding:6px 10px;align-self:flex-start}
+.lcard{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;background:#ffffff;border:1px solid var(--line);padding:11px 12px;cursor:pointer;transition:border-color .2s,background .2s}
+.lcard input{position:absolute;opacity:0;pointer-events:none}
+.lbox{width:22px;height:22px;border:2px solid var(--line-2);display:grid;place-items:center;margin-top:1px}
+.lcard input:checked+.lbox{background:var(--green);border-color:var(--green)}
+.lcard input:checked+.lbox::after{content:"";width:6px;height:11px;border:solid #ffffff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.lcard input:focus-visible+.lbox{outline:2px solid var(--cyan);outline-offset:2px}
+.lcard:has(input:checked){border-color:var(--green);background:#f4fbf7}
+.lc b{display:block;font-size:14px;font-weight:600}
+.lc small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.lsrc{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:6px}
+.lsrc i{font-style:normal;font-family:var(--f-display);font-weight:700;font-size:10.5px;background:var(--tape);padding:1px 6px}
+.lsrc em{font-style:normal;font-size:11.5px;color:var(--red);font-weight:600;margin-left:4px}
+@media (max-width:1180px){ .watch-grid{grid-template-columns:repeat(3,minmax(0,1fr))} .l-cols{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:980px){ .dossier-wrap,.lessons{grid-template-columns:minmax(0,1fr)} .l-side{position:static} .pred{grid-template-columns:minmax(0,1fr)} .rp-cases{grid-template-columns:repeat(4,minmax(0,1fr))} }
+@media (max-width:640px){ .watch-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .f-head{grid-template-columns:110px minmax(0,1fr)} .stamp{display:none} .mug{height:130px} .rp-ctl{grid-template-columns:minmax(0,1fr) auto} .rp-ctl .rng{grid-column:1/-1;grid-row:2} .st-detail{grid-template-columns:auto minmax(0,1fr)} .st-detail .jump{grid-column:1/-1} }
+
 /* ---------- responsive ---------- */
 @media (max-width:1180px){
   .stage{grid-template-columns:minmax(0,1fr) 320px}
@@ -415,18 +594,12 @@ svg text{font-family:var(--f-mono)}
       <div><span class="k">현장</span><span class="v">송도 스마트 물류센터 신축공사</span></div>
       <div><span class="k">규모</span><span class="v">B1 / 6F · 계약 486억 · 공기 40주</span></div>
     </div>
-    <div class="cases" role="tablist" aria-label="사건 선택">
-      <button class="case-tab" type="button" role="tab" data-case="schedule" aria-selected="true"><b>CASE A</b>공정 지연</button>
-      <button class="case-tab" type="button" role="tab" data-case="cost" aria-selected="false"><b>CASE B</b>원가 초과</button>
-      <button class="case-tab" type="button" role="tab" data-case="safety" aria-selected="false"><b>CASE C</b>안전 사고</button>
-      <button class="case-tab" type="button" role="tab" data-case="quality" aria-selected="false"><b>CASE D</b>품질 하자</button>
-      <button class="case-tab board-tab" type="button" role="tab" data-case="board" aria-selected="false"><b>BOARD</b>종합 보드</button>
-    </div>
     <div class="top-right">
       <span class="live"><i></i>LIVE ANALYSIS</span>
       <span id="clock">--:--:--</span>
     </div>
   </header>
+  <nav class="rail" id="rail" aria-label="사건과 수사 도구"></nav>
 
   <div class="stage">
     <section class="viewport" aria-live="polite">
@@ -2328,17 +2501,1305 @@ const SCENES_BOARD = [
     log:`합산 노출액 ${EXPOSURE_T.toFixed(1)}억 · 통합 패키지` }
 ];
 
+/* ======================== SHARED UI HELPERS (E~) ======================== */
+const kpiRow = arr => `<div class="kpis">${arr.map(([k, v, u, cls, col]) => `<div class="kpi ${cls || ""}"><div class="k">${k}</div><div class="v"${col ? ` style="color:${col}"` : ""}>${v}${u ? `<small>${u}</small>` : ""}</div></div>`).join("")}</div>`;
+const evCard = o => `<div class="ev${o.key ? " key" : ""}"><div class="top"><span class="eyebrow">${o.t}</span><span class="chip ${o.cc || "mute"}">${o.chip}</span></div><div class="r"${o.vc ? ` style="color:${o.vc}"` : ""}>${o.v}</div><p>${o.p}</p></div>`;
+const growY = (r, y0, d) => { if (reduced) return; r.style.transformOrigin = `0 ${y0}px`; r.style.transform = "scaleY(0)"; r.style.transition = `transform .55s cubic-bezier(.3,0,.2,1) ${d}s`; requestAnimationFrame(() => requestAnimationFrame(() => { r.style.transform = "scaleY(1)"; })); };
+const growX = (r, x0, d) => { if (reduced) return; r.style.transformOrigin = `${x0}px 0`; r.style.transform = "scaleX(0)"; r.style.transition = `transform .6s cubic-bezier(.3,0,.2,1) ${d}s`; requestAnimationFrame(() => requestAnimationFrame(() => { r.style.transform = "scaleX(1)"; })); };
+const fadeIn = (n, d) => { if (reduced) return n; n.style.opacity = 0; n.style.transition = `opacity .35s ease ${d}s`; requestAnimationFrame(() => requestAnimationFrame(() => { n.style.opacity = 1; })); return n; };
+const KR = "IBM Plex Sans KR, sans-serif";
+const C = { ink:"#0f1d33", blue:"#0b72c4", amber:"#d97706", red:"#d6334a", green:"#12945f", violet:"#7a3fd1", muted:"#5b6b84", dim:"#94a1b5", line:"#dbe2ec", tape:"#f5c518", teal:"#0f8b8d" };
+function gauge(svg, cx, cy, r, frac, col, label, sub){
+  const a0 = Math.PI, a1 = Math.PI + Math.PI * Math.max(0, Math.min(1, frac));
+  const arc = (a, b, rr) => `M${cx + Math.cos(a) * rr} ${cy + Math.sin(a) * rr} A${rr} ${rr} 0 ${b - a > Math.PI ? 1 : 0} 1 ${cx + Math.cos(b) * rr} ${cy + Math.sin(b) * rr}`;
+  el("path", { d:arc(Math.PI, 2 * Math.PI - 0.0001, r), fill:"none", stroke:"#e6ebf2", "stroke-width":18 }, svg);
+  for (let k = 0; k <= 10; k++){ const a = Math.PI + Math.PI * k / 10; el("line", { x1:cx + Math.cos(a) * (r + 12), y1:cy + Math.sin(a) * (r + 12), x2:cx + Math.cos(a) * (r + (k % 5 ? 16 : 20)), y2:cy + Math.sin(a) * (r + (k % 5 ? 16 : 20)), stroke:C.dim }, svg); }
+  if (frac > 0.001) el("path", { d:arc(a0, a1, r), fill:"none", stroke:col, "stroke-width":18 }, svg);
+  const nx = cx + Math.cos(a1) * (r - 26), ny = cy + Math.sin(a1) * (r - 26);
+  el("line", { x1:cx, y1:cy, x2:nx, y2:ny, stroke:C.ink, "stroke-width":3, "stroke-linecap":"round" }, svg);
+  el("circle", { cx, cy, r:7, fill:C.ink }, svg);
+  tx(svg, cx, cy + 36, label, { "text-anchor":"middle", "font-size":28, "font-weight":700, fill:col, "font-family":"Chakra Petch, sans-serif" });
+  if (sub) tx(svg, cx, cy + 56, sub, { "text-anchor":"middle", "font-size":12, fill:C.muted, "font-family":KR });
+}
+
+/* ======================== CASE E : DESIGN CHANGE / CLAIM ======================== */
+const CHG_RAW = [
+  [6,"토목","설계 누락",0.42,-5],[9,"골조","설계 누락",0.88,-3],[12,"설비","설계 누락",0.55,-7],[15,"골조","설계 누락",0.96,6],
+  [17,"골조","설계 누락",1.12,9],[18,"전기","설계 누락",0.48,4],[19,"설비","설계 누락",0.61,-2],[20,"철골","설계 누락",0.38,5],
+  [8,"외장","발주처 요청",0.72,-10],[11,"전기","발주처 요청",0.35,-6],[14,"설비","발주처 요청",0.64,-4],[18,"외장","발주처 요청",0.91,3],[21,"전기","발주처 요청",0.58,-3],
+  [10,"골조","현장 판단",0.31,0],[16,"골조","현장 판단",0.84,7],[17,"골조","현장 판단",1.05,11],[17,"철골","현장 판단",0.52,8],[18,"골조","현장 판단",0.77,6],[19,"설비","현장 판단",0.46,5],[20,"골조","현장 판단",0.65,4],
+  [7,"토목","법규·인허가",0.38,-12],[13,"전기","법규·인허가",0.44,-8],[19,"외장","법규·인허가",0.58,-5]
+];
+const CHG_CAUSES = [ { k:"설계 누락", c:C.blue }, { k:"발주처 요청", c:C.teal }, { k:"현장 판단", c:C.red }, { k:"법규·인허가", c:C.violet } ];
+const CHG_TRADES = ["토목","골조","철골","설비","전기","외장"];
+const CHG = CHG_RAW.map((r, i) => {
+  const [w, trade, cause, amt, lag] = r;
+  const verdict = cause === "현장 판단" ? "불가" : lag > 0 ? "협의" : "가능";
+  return { id:"CO-" + String(i + 1).padStart(2, "0"), w, trade, cause, amt, lag, verdict, exec:addDays(weekStart(w), 2 + (i % 4)), };
+}).sort((a, b) => a.w - b.w);
+CHG.forEach(c => { c.instr = addDays(c.exec, c.lag); });
+const CHG_T = CHG.reduce((s, c) => s + c.amt, 0);
+const CHG_PRE = CHG.filter(c => c.lag > 0);
+const CHG_PRE_LATE = CHG_PRE.filter(c => c.w >= 15).length;
+const VSUM = v => CHG.filter(c => c.verdict === v).reduce((s, c) => s + c.amt, 0);
+const CHG_OK = VSUM("가능"), CHG_NEG = VSUM("협의"), CHG_NO = VSUM("불가");
+
+function eMap(){
+  body.innerHTML = kpiRow([["설계변경", CHG.length, "건"], ["증액 합계", CHG_T.toFixed(1), "억", "warn"], ["서면보다 시공이 먼저", CHG_PRE.length, "건", "crit"], ["청구 불가 판정", CHG_NO.toFixed(1), "억", "crit"]]) + `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">설계변경 이력 지도 · 원 크기 = 금액</span>
+        <div class="legend">${CHG_CAUSES.map(c => `<span style="color:${c.c}">● ${c.k}</span>`).join("")}</div>
+      </div>
+      <div class="chart-scroll"><svg id="e1" viewBox="0 0 1000 360" role="img" aria-label="주차와 공종별 설계변경 금액 버블 차트"></svg></div>
+    </div>`;
+  const svg = $("e1"), L = 70, Rr = 20, T = 30, B = 40, W = 1000, H = 360, w0 = 5, w1 = NOW_W;
+  const xs = w => L + (w - w0) / (w1 - w0) * (W - L - Rr), lh = (H - T - B) / CHG_TRADES.length, ys = t => T + CHG_TRADES.indexOf(t) * lh + lh / 2;
+  el("rect", { x:xs(15) - 10, y:T - 18, width:xs(w1) - xs(15) + 20, height:H - B - T + 18, fill:"rgba(214,51,74,.05)" }, svg);
+  tx(svg, xs(15) - 4, T - 6, "W15~ 만회 압박 구간", { "font-size":11.5, fill:C.red, "font-weight":600 });
+  CHG_TRADES.forEach(t => { el("line", { x1:L, x2:W - Rr, y1:ys(t), y2:ys(t), class:"gridl" }, svg); tx(svg, L - 12, ys(t) + 5, t, { "text-anchor":"end", "font-size":13, fill:C.ink, "font-family":KR, "font-weight":500 }); });
+  for (let w = w0; w <= w1; w += 2) tx(svg, xs(w), H - B + 22, "W" + w, { class:"ax", "text-anchor":"middle" });
+  const seen = {};
+  CHG.forEach((c, i) => {
+    const key = c.w + c.trade; seen[key] = (seen[key] || 0) + 1;
+    const x = xs(c.w) + (seen[key] - 1) * 18, y = ys(c.trade), r = 8 + Math.sqrt(c.amt) * 16;
+    const col = CHG_CAUSES.find(k => k.k === c.cause).c;
+    const g = fadeIn(el("g", null, svg), 0.1 + i * 0.04);
+    el("circle", { cx:x, cy:y, r, fill:col, "fill-opacity":.18, stroke:col, "stroke-width":c.lag > 0 ? 2.5 : 1.2, "stroke-dasharray":c.lag > 0 ? "4 3" : "" }, g);
+    el("circle", { cx:x, cy:y, r:3, fill:col }, g);
+    if (c.amt >= 0.8) tx(g, x, seen[key] > 1 ? y + r + 13 : y - r - 5, c.amt.toFixed(2) + "억", { "text-anchor":"middle", "font-size":11, fill:col, "font-weight":600 });
+  });
+  tx(svg, W - Rr, H - 6, "점선 테두리 = 서면 지시보다 시공이 먼저", { class:"ax", "text-anchor":"end", fill:C.red });
+  return null;
+}
+
+function eSankey(){
+  const outs = [ { k:"가능", lab:"청구 가능", c:C.green }, { k:"협의", lab:"협의 필요", c:C.amber }, { k:"불가", lab:"청구 불가", c:C.red } ];
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">돈의 흐름 · 변경 원인 → 청구 판정 (${CHG_T.toFixed(1)}억)</span><span class="eyebrow" style="color:var(--dim)">띠 굵기 = 금액</span></div>
+      <div class="chart-scroll"><svg id="e2" viewBox="0 0 1000 380" role="img" aria-label="설계변경 원인별 청구 판정 흐름도"></svg></div>
+    </div>
+    <div class="ev-grid">
+      ${evCard({ t:"청구 가능", chip:"서면 지시 완비", cc:"ok", v:CHG_OK.toFixed(1) + "억", vc:C.green, p:"설계 누락 · 발주처 요청 중 서면이 먼저 나온 건입니다." })}
+      ${evCard({ t:"협의 필요", chip:"시공 선행", cc:"warn", v:CHG_NEG.toFixed(1) + "억", vc:C.amber, p:"원인은 정당하지만 서면보다 시공이 먼저라 근거가 약합니다." })}
+      ${evCard({ t:"청구 불가", chip:"현장 판단", cc:"crit", v:CHG_NO.toFixed(1) + "억", p:"발주처 지시 없이 현장이 스스로 바꾼 변경입니다.", key:true })}
+    </div>`;
+  const svg = $("e2"), x0 = 220, x1 = 760, nw = 18, T = 20, gap = 18, H = 340;
+  const scale = (H - gap * 3) / CHG_T;
+  let y = T; const L = {};
+  CHG_CAUSES.forEach(c => { const v = CHG.filter(z => z.cause === c.k).reduce((s, z) => s + z.amt, 0); L[c.k] = { y, h:v * scale, v, c:c.c, off:0 }; y += v * scale + gap; });
+  y = T + 10; const R = {};
+  const rg = (H - gap * 2 - CHG_T * scale) / 2;
+  outs.forEach(o => { const v = VSUM(o.k); R[o.k] = { y, h:v * scale, v, c:o.c, off:0, lab:o.lab }; y += v * scale + gap + rg * 0.4; });
+  let k = 0;
+  CHG_CAUSES.forEach(c => outs.forEach(o => {
+    const v = CHG.filter(z => z.cause === c.k && z.verdict === o.k).reduce((s, z) => s + z.amt, 0);
+    if (v <= 0) return;
+    const h = v * scale, a = L[c.k], b = R[o.k];
+    const ya = a.y + a.off, yb = b.y + b.off; a.off += h; b.off += h;
+    const mx = (x0 + nw + x1) / 2;
+    const d = `M${x0 + nw} ${ya} C${mx} ${ya} ${mx} ${yb} ${x1} ${yb} L${x1} ${yb + h} C${mx} ${yb + h} ${mx} ${ya + h} ${x0 + nw} ${ya + h}Z`;
+    fadeIn(el("path", { d, fill:o.k === "불가" ? C.red : c.c, "fill-opacity":o.k === "불가" ? .35 : .2 }, svg), 0.2 + k++ * 0.08);
+  }));
+  Object.entries(L).forEach(([name, n]) => {
+    el("rect", { x:x0, y:n.y, width:nw, height:n.h, fill:n.c }, svg);
+    tx(svg, x0 - 12, n.y + n.h / 2 - 2, name, { "text-anchor":"end", "font-size":14, fill:C.ink, "font-family":KR, "font-weight":600 });
+    tx(svg, x0 - 12, n.y + n.h / 2 + 15, n.v.toFixed(1) + "억", { "text-anchor":"end", "font-size":12, fill:n.c, "font-weight":600 });
+  });
+  Object.values(R).forEach(n => {
+    el("rect", { x:x1, y:n.y, width:nw, height:n.h, fill:n.c }, svg);
+    tx(svg, x1 + nw + 12, n.y + n.h / 2 - 2, n.lab, { "font-size":14, fill:C.ink, "font-family":KR, "font-weight":600 });
+    tx(svg, x1 + nw + 12, n.y + n.h / 2 + 15, n.v.toFixed(1) + "억 · " + Math.round(n.v / CHG_T * 100) + "%", { "font-size":12, fill:n.c, "font-weight":600 });
+  });
+  return null;
+}
+
+function eDumbbell(){
+  const rows = CHG.slice().sort((a, b) => a.exec - b.exec);
+  const preAmt = CHG_PRE.reduce((s, c) => s + c.amt, 0);
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">변경 ${CHG.length}건 · 시공일과 서면 지시일의 순서</span>
+        <div class="legend"><span style="color:var(--fg)">● 시공일</span><span style="color:var(--muted)">○ 서면 지시일</span><span style="color:var(--red)">━ 시공이 먼저</span></div>
+      </div>
+      <div class="chart-scroll"><svg id="e3" viewBox="0 0 1000 ${rows.length * 17 + 60}" role="img" aria-label="설계변경별 시공일과 서면 지시일 비교"></svg></div>
+    </div>
+    <div class="ev-grid">
+      ${evCard({ t:"시공 선행", chip:`${CHG_PRE.length}건`, cc:"crit", v:preAmt.toFixed(1) + "억", p:"서면 지시 없이 먼저 시공한 금액입니다. 청구 근거가 약해집니다.", key:true })}
+      ${evCard({ t:"W15 이후 집중", chip:"만회 압박", cc:"warn", v:`${CHG_PRE_LATE} / ${CHG_PRE.length}건`, vc:C.amber, p:"사건 A의 만회 압박이 시작된 뒤로 서류보다 손이 먼저 나갔습니다." })}
+      ${evCard({ t:"최장 선행", chip:"구두 지시", cc:"mute", v:Math.max(...CHG.map(c => c.lag)) + "일", p:"구두로 시작해 서면은 열흘 넘게 지나서야 나왔습니다." })}
+    </div>`;
+  const svg = $("e3"), L = 150, Rr = 30, T = 34, rh = 17, W = 1000;
+  const t0 = addDays(weekStart(5), -7).getTime(), t1 = weekEnd(NOW_W).getTime() + 86400000 * 7;
+  const xs = d => L + (d.getTime() - t0) / (t1 - t0) * (W - L - Rr);
+  for (let w = 5; w <= NOW_W + 1; w += 2){ const x = xs(weekStart(w)); el("line", { x1:x, x2:x, y1:T - 6, y2:T + rows.length * rh, class:"gridl" }, svg); tx(svg, x, T - 12, md(weekStart(w)), { class:"ax", "text-anchor":"middle" }); }
+  const xm = xs(weekStart(15));
+  el("line", { x1:xm, x2:xm, y1:T - 22, y2:T + rows.length * rh, stroke:C.red, "stroke-dasharray":"4 3" }, svg);
+  rows.forEach((c, i) => {
+    const y = T + i * rh + rh / 2, a = xs(c.exec), b = xs(c.instr), pre = c.lag > 0;
+    tx(svg, 8, y + 4, `${c.id} ${c.trade}`, { "font-size":11, fill:pre ? C.red : C.muted, "font-weight":pre ? 600 : 400, "font-family":KR });
+    tx(svg, L - 10, y + 4, c.amt.toFixed(2), { class:"ax", "text-anchor":"end", fill:pre ? C.red : undefined });
+    const g = fadeIn(el("g", null, svg), 0.05 + i * 0.03);
+    el("line", { x1:a, x2:b, y1:y, y2:y, stroke:pre ? C.red : C.dim, "stroke-width":pre ? 3 : 1.5 }, g);
+    el("circle", { cx:b, cy:y, r:4.5, fill:"#ffffff", stroke:C.muted, "stroke-width":1.5 }, g);
+    el("circle", { cx:a, cy:y, r:4.5, fill:pre ? C.red : C.ink }, g);
+    if (pre && c.lag >= 8) tx(g, b + 8, y + 4, `+${c.lag}일`, { "font-size":10.5, fill:C.red, "font-weight":600 });
+  });
+  return null;
+}
+
+function eClaim(){
+  const items = [
+    { id:"eConf", lab:"서면 확인서 소급 확보", note:`협의 대상 ${CHG.filter(c => c.verdict === "협의").length}건에 발주처 감독 확인서를 받습니다.`, eff:"협의 인정률 45% → 75%" },
+    { id:"eDoc", lab:"작업일보 · 사진 증빙 정리", note:"시공 시점의 일보, 사진, 회의록을 변경 건별로 묶습니다.", eff:"전 항목 인정률 +8%p" },
+    { id:"eVe", lab:"현장 판단 변경을 VE 제안으로 전환", note:"품질이나 공기에 이득이 있던 변경을 가치공학(VE) 제안으로 다시 올립니다.", eff:"불가 금액의 30%를 협의로" },
+    { id:"eRule", lab:"'서면 없이 시공 금지' 원칙", note:"남은 공정에서 새로 생길 변경에 적용합니다. 지금 금액에는 영향이 없습니다.", eff:"향후 손실 예방" }
+  ];
+  body.innerHTML = `
+    <div class="sim">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">청구 패키지 구성</span></div>
+        ${items.map((it, i) => `<div class="ctl"${i === items.length - 1 ? ' style="border-bottom:0"' : ""}>
+          <label class="tg" for="${it.id}"><span class="ctl-head" style="flex:1"><b>${it.lab}</b><span>${it.eff}</span></span><input type="checkbox" id="${it.id}"><span class="sl"></span></label><p>${it.note}</p></div>`).join("")}
+        <div class="sim-actions"><button class="btn" type="button" id="eAll">전체 적용</button><button class="btn" type="button" id="eReset">초기화</button></div>
+      </div>
+      <div class="panel result">
+        <div class="panel-head" style="margin:0"><span class="eyebrow">예상 회수 금액 · 증액 ${CHG_T.toFixed(1)}억 중</span></div>
+        <svg id="e4" class="tl" viewBox="0 0 520 250" role="img" aria-label="설계변경 예상 회수율 게이지"></svg>
+        <div class="ledger">
+          <div>청구 가능분 (인정률 ${90}%)</div><div id="eL1">—</div>
+          <div>협의 필요분</div><div id="eL2">—</div>
+          <div>청구 불가분</div><div id="eL3">—</div>
+          <div class="tot">예상 회수 합계</div><div class="tot" id="eL4">—</div>
+        </div>
+        <div class="hint" id="eHint"></div>
+      </div>
+    </div>`;
+  const svg = $("e4");
+  const base = () => CHG_OK * 0.9 + CHG_NEG * 0.45;
+  function update(){
+    const conf = $("eConf").checked, doc = $("eDoc").checked, ve = $("eVe").checked, rule = $("eRule").checked;
+    const add = doc ? 0.08 : 0;
+    const okR = Math.min(0.98, 0.9 + add), negR = (conf ? 0.75 : 0.45) + add;
+    const veAmt = ve ? CHG_NO * 0.3 : 0;
+    const r1 = CHG_OK * okR, r2 = (CHG_NEG + veAmt) * negR, r3 = 0;
+    const tot = r1 + r2 + r3;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    gauge(svg, 260, 175, 130, tot / CHG_T, tot / CHG_T > 0.7 ? C.green : tot / CHG_T > 0.5 ? C.amber : C.red, tot.toFixed(1) + "억", `회수율 ${Math.round(tot / CHG_T * 100)}% · 조치 전 ${base().toFixed(1)}억`);
+    $("eL1").textContent = r1.toFixed(2) + "억";
+    $("eL2").textContent = r2.toFixed(2) + "억" + (ve ? " (VE 포함)" : "");
+    $("eL3").textContent = ((CHG_NO - veAmt)).toFixed(2) + "억 회수 불가";
+    $("eL4").textContent = tot.toFixed(2) + "억";
+    $("eHint").innerHTML = rule ? `남은 공정 변경에 원칙을 적용하면 이번처럼 협의로 밀리는 금액이 새로 생기지 않습니다. 사건 B 손익에 <b style="color:var(--fg)">+${(tot - base()).toFixed(1)}억</b>을 더할 수 있습니다.`
+      : tot - base() < 0.05 ? `왼쪽 대책을 켜 보세요. 확인서 소급 확보만으로도 협의 금액의 인정률이 크게 올라갑니다.` : `조치 전과 비교해 <b style="color:var(--fg)">+${(tot - base()).toFixed(1)}억</b>을 더 회수할 수 있습니다. 회수분은 사건 B 손익에 그대로 더해집니다.`;
+  }
+  items.forEach(it => $(it.id).addEventListener("change", update));
+  $("eAll").addEventListener("click", () => { items.forEach(it => { $(it.id).checked = true; }); update(); });
+  $("eReset").addEventListener("click", () => { items.forEach(it => { $(it.id).checked = false; }); update(); });
+  update();
+  return null;
+}
+
+const SCENES_E = [
+  { label:"변경 지도", title:"설계변경 이력 지도", meta:`변경 ${CHG.length}건 · 증액 ${CHG_T.toFixed(1)}억`, scan:"변경 지시서 로드 중", render:eMap,
+    say:`소장님, 이번엔 설계변경이에요. ${CHG.length}건, 증액이 [[${CHG_T.toFixed(1)}억]]이에요. 원 크기가 금액인데, 15주차 이후 골조 줄에 큰 원이 몰려 있죠. 그리고 점선 테두리가 [[${CHG_PRE.length}건]]이에요. 서면 지시보다 시공이 먼저 된 변경이에요.`,
+    log:`설계변경 ${CHG.length}건 · ${CHG_T.toFixed(1)}억 · 시공 선행 ${CHG_PRE.length}건` },
+  { label:"돈의 흐름", title:"원인에서 청구까지", meta:`원인 4개 → 판정 3개`, scan:"청구 가능성 판정 중", render:eSankey,
+    say:`변경 금액이 어디로 흘러가는지 따라가 봤어요. 청구 가능한 돈은 [[${CHG_OK.toFixed(1)}억]]뿐이에요. ${CHG_NEG.toFixed(1)}억은 원인은 정당한데 서류가 늦어서 협의로 밀렸고, [[${CHG_NO.toFixed(1)}억]]은 현장이 스스로 판단해서 바꾼 거라 청구가 안 돼요.`,
+    log:`청구 가능 ${CHG_OK.toFixed(1)}억 · 협의 ${CHG_NEG.toFixed(1)}억 · 불가 ${CHG_NO.toFixed(1)}억` },
+  { label:"서류 추적", title:"결정적 증거 · 손이 서류보다 빨랐다", meta:`시공일 vs 서면 지시일`, scan:"지시서 날짜 대조 중", render:eDumbbell,
+    say:`변경마다 시공일과 서면 지시일을 나란히 놓았어요. 빨간 선이 [[시공이 먼저]] 된 건이에요. ${CHG_PRE.length}건 중 [[${CHG_PRE_LATE}건]]이 15주차 이후예요. 공기를 만회하느라 구두 지시만 받고 먼저 시공한 거죠. 사건 A의 압박이 여기서는 청구권을 깎아 먹었어요.`,
+    log:`시공 선행 ${CHG_PRE_LATE}/${CHG_PRE.length}건 W15 이후 집중` },
+  { label:"청구 패키지", title:"돌려받을 수 있는 돈", meta:`청구 패키지 · 회수율 시뮬레이션`, scan:"청구 패키지 계산 중", render:eClaim,
+    say:`지금 그대로 청구하면 회수 예상액이 [[${(CHG_OK * 0.9 + CHG_NEG * 0.45).toFixed(1)}억]]이에요. 확인서를 소급해서 받고 증빙을 정리하면 더 올라가요. 현장 판단 변경도 품질이나 공기에 이득이 있었다면 [[VE 제안]]으로 다시 올려볼 수 있어요.`,
+    log:`청구 회수 시뮬레이션 · 조치 전 ${(CHG_OK * 0.9 + CHG_NEG * 0.45).toFixed(1)}억` }
+];
+
+/* ======================== CASE F : SUBCONTRACTORS ======================== */
+const AXES = ["공정","품질","안전","원가","협조"];
+const VENDORS = [
+  { id:"V1", name:"A레미콘", trade:"레미콘 (기존)", s:[38,92,85,80,70], inv:[3,2,0,0,0], note:"공장 설비 고장으로 13일 출하 중단. 품질은 우수합니다." },
+  { id:"V2", name:"B레미콘", trade:"레미콘 (긴급 대체)", s:[70,41,78,66,60], inv:[0,1,0,4,1], note:"연속 3회 평균 강도 미달. 검증 없이 투입됐습니다." },
+  { id:"V3", name:"갑 형틀", trade:"형틀 (기존)", s:[84,86,88,82,64], inv:[1,1,0,0,0], note:"일감 중단 때 다른 현장으로 이동했습니다." },
+  { id:"V4", name:"을 형틀", trade:"형틀 (대체)", s:[66,48,35,70,72], inv:[1,1,4,3,2], note:"신규 인원 비중 높음. 재해 3건 모두 이 팀에서 났습니다." },
+  { id:"V5", name:"C 철근가공", trade:"철근 (공장가공)", s:[85,90,86,84,80], inv:[0,0,0,0,0], note:"로스율 3% 이내 유지. 기준 업체입니다." },
+  { id:"V6", name:"D 현장가공", trade:"철근 (대체 현장가공)", s:[72,45,58,42,75], inv:[0,3,1,3,1], note:"로스율 20% 이상, 피복 부족 집중 구간." },
+  { id:"V7", name:"E 전기", trade:"전기 · 통신", s:[80,82,90,78,84], inv:[0,0,0,0,1], note:"설계변경 1건 외 특이 사항 없습니다." },
+  { id:"V8", name:"F 설비", trade:"기계설비", s:[76,79,84,81,70], inv:[0,0,0,1,1], note:"슬리브 누락 1건 외 정상 범위입니다." }
+];
+const VAVG = AXES.map((_, i) => avg(VENDORS.map(v => v.s[i])));
+const vScore = (v, w) => { const ws = w || [1,1,1,1,1], t = ws.reduce((s, x) => s + x, 0) || 1; return v.s.reduce((s, x, i) => s + x * ws[i], 0) / t; };
+const VRISK = VENDORS.map(v => 100 - vScore(v));
+const INV_T = VENDORS.reduce((s, v) => s + v.inv.reduce((a, b) => a + b, 0), 0);
+const TOP3 = VENDORS.map(v => ({ v, n:v.inv.reduce((a, b) => a + b, 0) })).sort((a, b) => b.n - a.n).slice(0, 3);
+const TOP3_SHARE = TOP3.reduce((s, x) => s + x.n, 0) / INV_T;
+
+function fLineup(){
+  const order = VENDORS.map((v, i) => ({ v, r:VRISK[i] }));
+  body.innerHTML = `
+    <div class="lineup-wrap"><div class="lineup" id="lineup">
+      <div class="lu-scale">${[60,50,40,30,20,10].map(v => `<span style="bottom:${v / 70 * 100}%">${v}</span>`).join("")}</div>
+      ${order.map((o, i) => `<div class="lu-p${o.r > 40 ? " hot" : ""}" style="--h:${(o.r / 70 * 100).toFixed(1)}%;--d:${i * 0.08}s">
+        <div class="lu-body"><span class="lu-head"></span></div>
+        <div class="lu-plate"><b>${i + 1}</b><span>${o.v.name}</span><small>${o.v.trade}</small><em>리스크 ${o.r.toFixed(0)}</em></div>
+      </div>`).join("")}
+    </div></div>
+    <div class="ev-grid">
+      ${evCard({ t:"키가 가장 큰 용의자", chip:"리스크 최고", cc:"crit", v:VENDORS[3].name, p:VENDORS[3].note, key:true })}
+      ${evCard({ t:"2위", chip:`리스크 ${VRISK[5].toFixed(0)}`, cc:"warn", v:VENDORS[5].name, vc:C.amber, p:VENDORS[5].note })}
+      ${evCard({ t:"3위", chip:`리스크 ${VRISK[1].toFixed(0)}`, cc:"warn", v:VENDORS[1].name, vc:C.amber, p:VENDORS[1].note })}
+    </div>`;
+  return null;
+}
+
+function fRadar(){
+  body.innerHTML = `
+    <div class="s1-grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">업체 선택</span></div>
+        <div class="vpick" id="vpick">${VENDORS.map((v, i) => `<button type="button" class="vbtn${i === 3 ? " on" : ""}" data-i="${i}"><b>${v.name}</b><small>${v.trade}</small><span>${vScore(v).toFixed(0)}</span></button>`).join("")}</div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">5대 지표 프로파일</span><div class="legend"><span style="color:var(--red)">━ 선택 업체</span><span style="color:var(--muted)">┅ 현장 평균</span></div></div>
+        <svg id="f2" class="tl" viewBox="0 0 440 400" role="img" aria-label="업체 5대 지표 레이더 차트"></svg>
+        <p class="board-note" id="f2note"></p>
+      </div>
+    </div>`;
+  const svg = $("f2"), cx = 220, cy = 205, R = 150, n = AXES.length;
+  const P = (i, v) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(a) * R * v / 100, cy + Math.sin(a) * R * v / 100]; };
+  const draw = idx => {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    [20,40,60,80,100].forEach(v => el("path", { d:pts(AXES.map((_, i) => P(i, v))) + "Z", fill:v === 100 ? "#fbfcfe" : "none", stroke:C.line }, svg));
+    AXES.forEach((a, i) => { const [x, y] = P(i, 100), [lx, ly] = P(i, 118); el("line", { x1:cx, y1:cy, x2:x, y2:y, stroke:C.line }, svg); tx(svg, lx, ly + 5, a, { "text-anchor":"middle", "font-size":14, fill:C.ink, "font-family":KR, "font-weight":600 }); });
+    el("path", { d:pts(VAVG.map((v, i) => P(i, v))) + "Z", fill:"none", stroke:C.muted, "stroke-width":1.5, "stroke-dasharray":"5 4" }, svg);
+    const v = VENDORS[idx], col = vScore(v) < 65 ? C.red : vScore(v) < 75 ? C.amber : C.blue;
+    const poly = el("path", { d:pts(v.s.map((s, i) => P(i, s))) + "Z", fill:col, "fill-opacity":.18, stroke:col, "stroke-width":2.5 }, svg);
+    fadeIn(poly, 0);
+    v.s.forEach((s, i) => { const [x, y] = P(i, s); el("circle", { cx:x, cy:y, r:4.5, fill:col }, svg); tx(svg, x + (x >= cx ? 8 : -8), y - 6, s, { "font-size":12, fill:col, "font-weight":700, "text-anchor":x >= cx ? "start" : "end" }); });
+    const worst = v.s.indexOf(Math.min(...v.s));
+    $("f2note").innerHTML = `<b style="color:var(--fg)">${v.name}</b> 종합 ${vScore(v).toFixed(0)}점. 가장 약한 지표는 <b style="color:${col}">${AXES[worst]} ${v.s[worst]}점</b>이고, 현장 평균보다 ${(VAVG[worst] - v.s[worst]).toFixed(0)}점 낮습니다. ${v.note}`;
+  };
+  $("vpick").addEventListener("click", e => { const b = e.target.closest(".vbtn"); if (!b) return; body.querySelectorAll(".vbtn").forEach(x => x.classList.toggle("on", x === b)); draw(+b.dataset.i); });
+  draw(3);
+  return null;
+}
+
+function fMatrix(){
+  const cases = ["A 공정","B 원가","C 안전","D 품질","E 변경"];
+  const mx = Math.max(...VENDORS.flatMap(v => v.inv));
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">업체 × 사건 · 증거 연루 건수</span><span class="eyebrow" style="color:var(--dim)">칸이 진할수록 연루 증거가 많습니다</span></div>
+      <div class="chart-scroll"><svg id="f3" viewBox="0 0 1000 400" role="img" aria-label="업체별 사건 연루 매트릭스"></svg></div>
+    </div>
+    <div class="ev-grid">
+      ${evCard({ t:"공통 용의자 3곳", chip:"증거 집중", cc:"crit", v:Math.round(TOP3_SHARE * 100) + "%", p:`${TOP3.map(t => t.v.name).join(", ")}이(가) 전체 연루 증거의 대부분을 차지합니다.`, key:true })}
+      ${evCard({ t:"세 곳의 공통점", chip:"긴급 대체", cc:"warn", v:"모두 대체 투입", vc:C.amber, p:"레미콘 출하 중단 이후 검증 없이 급하게 들어온 업체들입니다." })}
+      ${evCard({ t:"깨끗한 업체", chip:"기준 업체", cc:"ok", v:VENDORS[4].name, vc:C.green, p:"연루 증거 0건. 다음 현장의 철근 기준 업체로 삼을 만합니다." })}
+    </div>`;
+  const svg = $("f3"), L = 190, T = 50, cw = 130, rh = 40;
+  cases.forEach((c, j) => tx(svg, L + j * cw + cw / 2, T - 16, c, { "text-anchor":"middle", "font-size":13, fill:C.ink, "font-family":KR, "font-weight":600 }));
+  tx(svg, L + cases.length * cw + 60, T - 16, "합계", { "text-anchor":"middle", "font-size":13, fill:C.ink, "font-family":KR, "font-weight":600 });
+  VENDORS.forEach((v, i) => {
+    const y = T + i * rh, tot = v.inv.reduce((a, b) => a + b, 0), top = TOP3.some(t => t.v === v);
+    tx(svg, L - 14, y + rh / 2 + 5, v.name, { "text-anchor":"end", "font-size":14, fill:top ? C.red : C.ink, "font-family":KR, "font-weight":top ? 700 : 500 });
+    v.inv.forEach((n, j) => {
+      const x = L + j * cw;
+      const r = el("rect", { x:x + 3, y:y + 3, width:cw - 6, height:rh - 6, fill:n ? C.red : "#f3f6fa", "fill-opacity":n ? 0.15 + n / mx * 0.75 : 1 }, svg);
+      fadeIn(r, 0.05 + (i * 5 + j) * 0.015);
+      if (n) tx(svg, x + cw / 2, y + rh / 2 + 5, n, { "text-anchor":"middle", "font-size":14, fill:n / mx > .5 ? "#ffffff" : C.ink, "font-weight":700 });
+    });
+    const bx = L + cases.length * cw + 20;
+    el("rect", { x:bx, y:y + 10, width:Math.max(2, tot / 11 * 140), height:rh - 20, fill:top ? C.red : C.dim }, svg);
+    tx(svg, bx + Math.max(2, tot / 11 * 140) + 8, y + rh / 2 + 5, tot, { "font-size":13, fill:top ? C.red : C.muted, "font-weight":700 });
+    if (top) el("rect", { x:6, y:y + 2, width:L + cases.length * cw + 190, height:rh - 4, fill:"none", stroke:C.red, "stroke-width":1.5, "stroke-dasharray":"5 4" }, svg);
+  });
+  return null;
+}
+
+function fGrade(){
+  body.innerHTML = `
+    <div class="sim">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">평가 가중치 · 다음 현장 기준</span></div>
+        ${AXES.map((a, i) => `<div class="ctl"${i === AXES.length - 1 ? ' style="border-bottom:0"' : ""}>
+          <div class="ctl-head"><b>${a}</b><span id="fwv${i}">×${i === 2 ? 2 : 1}</span></div>
+          <input type="range" class="rng" id="fw${i}" min="0" max="3" step="1" value="${i === 2 ? 2 : 1}" aria-label="${a} 가중치">
+        </div>`).join("")}
+        <div class="sim-actions"><button class="btn" type="button" id="fEq">균등 가중</button><button class="btn" type="button" id="fSafe">안전 · 품질 중시</button></div>
+      </div>
+      <div class="panel result">
+        <div class="panel-head" style="margin:0"><span class="eyebrow">다음 현장 업체 등급</span><span class="eyebrow" style="color:var(--dim)">가중치를 바꾸면 순위가 다시 매겨집니다</span></div>
+        <div class="grade" id="grade"></div>
+        <div class="hint" id="fHint"></div>
+      </div>
+    </div>`;
+  const grade = s => s >= 85 ? ["S", C.green] : s >= 78 ? ["A", C.blue] : s >= 70 ? ["B", C.teal] : s >= 60 ? ["C", C.amber] : ["D", C.red];
+  function update(){
+    const w = AXES.map((_, i) => +$("fw" + i).value);
+    AXES.forEach((_, i) => { $("fwv" + i).textContent = "×" + w[i]; });
+    const list = VENDORS.map(v => ({ v, s:vScore(v, w) })).sort((a, b) => b.s - a.s);
+    $("grade").innerHTML = list.map((o, k) => { const [g, c] = grade(o.s); return `<div class="g-row" style="--c:${c}"><span class="g-rank">${k + 1}</span><span class="g-badge">${g}</span><div><b>${o.v.name}</b><small>${o.v.trade}</small></div><div class="track"><i style="width:${o.s}%;background:${c}"></i></div><span class="g-s">${o.s.toFixed(1)}</span></div>`; }).join("");
+    const bottom = list.slice(-3).map(o => o.v.id).sort().join();
+    const robust = ["V2","V4","V6"].sort().join() === bottom;
+    $("fHint").innerHTML = robust ? `가중치를 이렇게 바꿔도 하위 3곳은 <b style="color:var(--red)">B레미콘 · 을 형틀 · D 현장가공</b> 그대로입니다. 긴급 대체 업체 검증 절차가 필요하다는 뜻입니다.` : `이 가중치에서는 하위 순위가 바뀝니다. 그래도 D등급 업체는 다음 현장 입찰에서 제외를 검토하세요.`;
+  }
+  AXES.forEach((_, i) => $("fw" + i).addEventListener("input", update));
+  $("fEq").addEventListener("click", () => { AXES.forEach((_, i) => { $("fw" + i).value = 1; }); update(); });
+  $("fSafe").addEventListener("click", () => { [1,3,3,1,1].forEach((v, i) => { $("fw" + i).value = v; }); update(); });
+  update();
+  return null;
+}
+
+const SCENES_F = [
+  { label:"용의자 라인업", title:"협력업체 라인업", meta:`업체 ${VENDORS.length}곳 · 키 = 리스크`, scan:"업체 기록 소환 중", render:fLineup,
+    say:`소장님, 용의자들을 한 줄로 세워 봤어요. 키가 클수록 리스크가 높아요. 가장 큰 건 [[을 형틀]], 그다음이 [[D 현장가공]]과 [[B레미콘]]이에요. 셋 다 레미콘 출하가 끊긴 뒤에 급하게 들어온 업체예요.`,
+    log:`리스크 상위 3: ${VENDORS[3].name} · ${VENDORS[5].name} · ${VENDORS[1].name}` },
+  { label:"프로파일", title:"업체별 5대 지표 프로파일", meta:`공정 · 품질 · 안전 · 원가 · 협조`, scan:"업체 프로파일 생성 중", render:fRadar,
+    say:`업체를 하나씩 눌러 보세요. 을 형틀은 공정은 그럭저럭인데 [[안전이 35점]]이에요. 반대로 A레미콘은 품질은 92점인데 [[공정이 38점]]이에요. 이번 사건의 시작이 바로 이 공정 점수예요.`,
+    log:`을 형틀 안전 35점 · A레미콘 공정 38점` },
+  { label:"공통 용의자", title:"결정적 증거 · 사건마다 나오는 이름", meta:`업체 ${VENDORS.length} × 사건 5`, scan:"사건별 연루 증거 교차 중", render:fMatrix,
+    say:`업체와 사건을 교차해 보면 같은 이름이 계속 나와요. 세 업체가 전체 연루 증거의 [[${Math.round(TOP3_SHARE * 100)}%]]예요. 공통점은 하나, [[검증 없이 긴급 투입]]됐다는 거예요. 반대로 C 철근가공은 증거가 한 건도 없어요.`,
+    log:`공통 용의자 3곳 · 연루 증거 ${Math.round(TOP3_SHARE * 100)}%` },
+  { label:"다음 현장 등급", title:"다음 현장 업체 등급", meta:`가중치 조절 · 실시간 등급`, scan:"등급 산정 중", render:fGrade,
+    say:`가중치를 직접 바꿔 보세요. 안전에 두 배를 주든, 원가를 중시하든 하위권은 거의 그대로예요. 결론은 업체를 바꾸는 것보다 [[긴급 대체 업체 검증 절차]]를 만드는 게 먼저라는 거예요.`,
+    log:`업체 등급 산정 · 긴급 대체 검증 절차 필요` }
+];
+
+/* ======================== CASE G : EQUIPMENT ======================== */
+const RG = rng(5150);
+const G_HOURS = [7,8,9,10,11,12,13,14,15,16,17,18];
+const G_BASE = [.30,.52,.47,.40,.36,.04,.40,.56,.50,.44,.31,.10];
+const G_U = WDAY.map((d, r) => G_BASE.map((v, c) => Math.max(0, Math.min(1, v * (r === 5 ? .85 : 1) + (RG() - .5) * .12 * (c === 5 ? 0 : 1)))));
+const G_OPS = [0,1,2,3,4,6,7,8,9,10];
+const G_UTIL = avg(G_U.flatMap(row => G_OPS.map(c => row[c])));
+const G_AVAIL = 720, G_WORK = Math.round(G_AVAIL * G_UTIL);
+const G_LOST = [ { k:"자재 미도착 대기", h:166, c:C.red, ctl:true }, { k:"레미콘 중단 대기", h:96, c:C.ink, ctl:false }, { k:"신호수 부재", h:62, c:C.amber, ctl:true }, { k:"풍속 작업중지", h:48, c:C.teal, ctl:true }, { k:"고장 · 점검", h:22, c:C.violet, ctl:false } ];
+G_LOST.push({ k:"기타", h:Math.max(4, G_AVAIL - G_WORK - G_LOST.reduce((s, x) => s + x.h, 0)), c:C.dim, ctl:false });
+const G_CTL = G_LOST.filter(x => x.ctl).reduce((s, x) => s + x.h, 0);
+const CRANE_DAY = 190, G_NEED = 1150;
+// 10.14 (수) 10분 단위 인양 기록
+const G_DAY = new Date(2026, 9, 14);
+const G_TRUCKS = [ [10,20,"철근 18t"], [10,50,"거푸집 자재"], [11,30,"철근 12t"], [13,40,"설비 슬리브"], [15,10,"철근 9t"] ];
+const G_BINS = Array.from({ length:66 }, (_, i) => {
+  const t = 7 * 60 + i * 10;
+  if (t >= 12 * 60 && t < 13 * 60) return 0;
+  let v = RG() < .18 ? 1 : 0;
+  G_TRUCKS.forEach(([h, m]) => { const a = h * 60 + m; if (t >= a && t < a + 60) v = Math.max(v, 2 + Math.round(RG() * 2)); });
+  return v;
+});
+const G_DAY_UTIL = G_BINS.filter((v, i) => v > 0).length / 60;
+const G_MORNING_IDLE = G_BINS.slice(0, 20).filter(v => v === 0).length * 10;
+
+function gClock(){
+  body.innerHTML = kpiRow([["타워크레인 가동률", Math.round(G_UTIL * 100), "%", "crit"], ["가용 시간 (W10–W21)", G_AVAIL, "h"], ["실제 인양 시간", G_WORK, "h", "", C.blue], ["관리 가능 손실", G_CTL, "h", "warn"]]) + `
+    <div class="s1-grid" style="grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">가동 시계 · 요일 × 시간대 가동률</span><span class="eyebrow" style="color:var(--dim)">바깥 고리 = 월요일 · 안쪽 = 토요일</span></div>
+        <svg id="g1" class="tl" viewBox="0 0 480 480" role="img" aria-label="요일과 시간대별 타워크레인 가동률 원형 차트"></svg>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">시간대별 평균 가동률</span></div>
+        <div class="chart-scroll"><svg id="g1b" viewBox="0 0 440 400" role="img" aria-label="시간대별 평균 가동률 막대"></svg></div>
+      </div>
+    </div>`;
+  const svg = $("g1"), cx = 240, cy = 240, r0 = 70, rw = 23, n = G_HOURS.length, A0 = -Math.PI / 2 - 5.5 * 2 * Math.PI / 12;
+  const seg = (r1, r2, a1, a2) => { const p = (r, a) => [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; const [x1, y1] = p(r2, a1), [x2, y2] = p(r2, a2), [x3, y3] = p(r1, a2), [x4, y4] = p(r1, a1); return `M${x1} ${y1} A${r2} ${r2} 0 0 1 ${x2} ${y2} L${x3} ${y3} A${r1} ${r1} 0 0 0 ${x4} ${y4}Z`; };
+  WDAY.forEach((d, r) => {
+    const ro = r0 + (WDAY.length - r) * rw, ri = ro - rw + 3;
+    G_HOURS.forEach((h, c) => {
+      const a1 = A0 + c * 2 * Math.PI / n + .02, a2 = A0 + (c + 1) * 2 * Math.PI / n - .02, v = G_U[r][c];
+      const col = c === 5 ? "#f3f6fa" : v < .35 ? C.red : v < .5 ? C.amber : C.blue;
+      fadeIn(el("path", { d:seg(ri, ro, a1, a2), fill:col, "fill-opacity":c === 5 ? 1 : .2 + v * .8 }, svg), (r * n + c) * 0.008);
+    });
+    const la = A0 + 5.5 * 2 * Math.PI / n, lr = ro - rw / 2 + 1;
+    tx(svg, cx + Math.cos(la) * lr, cy + Math.sin(la) * lr + 4, d, { "text-anchor":"middle", "font-size":11, fill:C.ink, "font-weight":700, "font-family":KR });
+  });
+  G_HOURS.forEach((h, c) => { const a = A0 + (c + .5) * 2 * Math.PI / n, rr = r0 + 6 * rw + 16; tx(svg, cx + Math.cos(a) * rr, cy + Math.sin(a) * rr + 4, h + "시", { "text-anchor":"middle", class:"ax", "font-size":11 }); });
+  el("circle", { cx, cy, r:r0 - 6, fill:"#ffffff", stroke:C.line }, svg);
+  tx(svg, cx, cy + 4, Math.round(G_UTIL * 100) + "%", { "text-anchor":"middle", "font-size":34, "font-weight":700, fill:C.red, "font-family":"Chakra Petch, sans-serif" });
+  tx(svg, cx, cy + 24, "평균 가동률", { "text-anchor":"middle", "font-size":11.5, fill:C.muted, "font-family":KR });
+  const b = $("g1b"), L = 50, T = 20, H = 400, B = 40, bw = (440 - L - 10) / n;
+  const ys = v => T + (1 - v) * (H - T - B);
+  [0, .25, .5, .75, 1].forEach(v => { el("line", { x1:L, x2:430, y1:ys(v), y2:ys(v), class:"gridl" }, b); tx(b, L - 8, ys(v) + 4, Math.round(v * 100) + "%", { class:"ax", "text-anchor":"end" }); });
+  G_HOURS.forEach((h, c) => {
+    const v = avg(G_U.map(row => row[c])), x = L + c * bw + bw * .18, w = bw * .64;
+    const col = c === 5 ? C.dim : v < .35 ? C.red : v < .5 ? C.amber : C.blue;
+    growY(el("rect", { x, y:ys(v), width:w, height:ys(0) - ys(v), fill:col, "fill-opacity":.85 }, b), ys(0), c * 0.04);
+    tx(b, x + w / 2, H - B + 18, String(h).padStart(2, "0"), { class:"ax", "text-anchor":"middle" });
+    if (c === 0 || c === 3 || c === 10) tx(b, x + w / 2, ys(v) - 6, Math.round(v * 100) + "%", { "text-anchor":"middle", "font-size":11.5, fill:col, "font-weight":700 });
+  });
+  el("line", { x1:L, x2:430, y1:ys(.6), y2:ys(.6), stroke:C.green, "stroke-dasharray":"5 4" }, b);
+  tx(b, 430, ys(.6) - 6, "목표 60%", { class:"ax", fill:C.green, "text-anchor":"end" });
+  return null;
+}
+
+function treemap(items, x, y, w, h, out){
+  if (!items.length) return out;
+  if (items.length === 1){ out.push(Object.assign({}, items[0], { rx:x, ry:y, rw:w, rh:h })); return out; }
+  const tot = items.reduce((s, i) => s + i.h, 0); let acc = 0, k = 0;
+  while (k < items.length - 1 && acc + items[k].h < tot / 2) acc += items[k++].h;
+  if (k === 0){ acc = items[0].h; k = 1; }
+  const a = items.slice(0, k), b = items.slice(k), f = acc / tot;
+  if (w >= h){ treemap(a, x, y, w * f, h, out); treemap(b, x + w * f, y, w * (1 - f), h, out); }
+  else { treemap(a, x, y, w, h * f, out); treemap(b, x, y + h * f, w, h * (1 - f), out); }
+  return out;
+}
+function gTree(){
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">잃어버린 시간 · 가용 ${G_AVAIL}시간의 행방</span><div class="legend"><span style="color:var(--blue)">■ 실제 인양</span><span style="color:var(--red)">■ 관리 가능 손실</span><span style="color:var(--muted)">■ 불가항력 · 기타</span></div></div>
+      <div class="chart-scroll"><svg id="g2" viewBox="0 0 1000 380" role="img" aria-label="크레인 가용 시간 사용 내역 트리맵"></svg></div>
+    </div>
+    <div class="ev-grid">
+      ${evCard({ t:"실제로 일한 시간", chip:`${Math.round(G_UTIL * 100)}%`, cc:"mute", v:G_WORK + "h", vc:C.blue, p:"임대료는 가용 시간 전부에 대해 냅니다." })}
+      ${evCard({ t:"가장 큰 손실", chip:"관리 가능", cc:"crit", v:G_LOST[0].h + "h", p:"자재가 크레인 계획 시간에 맞춰 도착하지 않았습니다.", key:true })}
+      ${evCard({ t:"관리 가능 손실 합계", chip:"자재 · 신호수 · 풍속", cc:"warn", v:G_CTL + "h", vc:C.amber, p:`임대비로 환산하면 약 ${(G_CTL / 10 * CRANE_DAY / 10000).toFixed(1)}억입니다.` })}
+    </div>`;
+  const items = [{ k:"실제 인양", h:G_WORK, c:C.blue }].concat(G_LOST).sort((a, b) => b.h - a.h);
+  const rects = treemap(items, 4, 4, 992, 372, []);
+  const svg = $("g2");
+  rects.forEach((r, i) => {
+    const g = fadeIn(el("g", null, svg), i * 0.08);
+    el("rect", { x:r.rx + 2, y:r.ry + 2, width:r.rw - 4, height:r.rh - 4, fill:r.c, "fill-opacity":r.k === "실제 인양" ? .85 : r.ctl ? .78 : .45 }, g);
+    if (r.rw > 70 && r.rh > 44){
+      const big = r.rw > 200 && r.rh > 90;
+      tx(g, r.rx + 14, r.ry + 28, r.k, { "font-size":big ? 16 : 12.5, fill:"#ffffff", "font-weight":700, "font-family":KR });
+      tx(g, r.rx + 14, r.ry + (big ? 54 : 46), `${r.h}h · ${Math.round(r.h / G_AVAIL * 100)}%`, { "font-size":big ? 15 : 12, fill:"#ffffff", "font-weight":600 });
+      if (r.ctl && r.rh > 90) tx(g, r.rx + 14, r.ry + r.rh - 14, "관리 가능", { "font-size":11, fill:"#ffffff", "font-weight":600 });
+    }
+  });
+  return null;
+}
+
+function gSeismo(){
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">${ymd(G_DAY)} (수) · 10분 단위 인양 횟수 지진계</span><div class="legend"><span style="color:var(--blue)">▮ 인양</span><span style="color:var(--amber)">▼ 자재 차량 도착</span><span style="color:var(--green)">▒ 인양 계획 시간</span></div></div>
+      <div class="chart-scroll"><svg id="g3" viewBox="0 0 1000 370" role="img" aria-label="하루 동안의 10분 단위 크레인 인양 기록"></svg></div>
+    </div>
+    <div class="ev-grid">
+      ${evCard({ t:"계획된 인양 시간", chip:"07:30–09:30", cc:"ok", v:"철근 인양", vc:C.green, p:"작업계획서상 오전에 철근을 올리기로 되어 있었습니다." })}
+      ${evCard({ t:"첫 철근 차량 도착", chip:"3시간 지연", cc:"crit", v:"10:20", p:`오전 내내 크레인이 ${G_MORNING_IDLE}분 동안 멈춰 있었습니다.`, key:true })}
+      ${evCard({ t:"이날 가동률", chip:"차량 따라 출렁임", cc:"warn", v:Math.round(G_DAY_UTIL * 100) + "%", vc:C.amber, p:"차량이 오면 몰아서 올리고, 없으면 멈추는 패턴입니다." })}
+    </div>`;
+  const svg = $("g3"), L = 50, Rr = 16, T = 76, H = 370, B = 50, n = G_BINS.length, bw = (1000 - L - Rr) / n;
+  const xt = (h, m) => L + ((h - 7) * 60 + m) / 10 * bw, ys = v => T + (1 - v / 4) * (H - T - B);
+  el("rect", { x:xt(7, 30), y:T - 10, width:xt(9, 30) - xt(7, 30), height:H - B - T + 10, fill:"rgba(18,148,95,.08)", stroke:"rgba(18,148,95,.4)", "stroke-dasharray":"4 4" }, svg);
+  tx(svg, xt(7, 30) + 6, T + 6, "계획: 철근 인양", { "font-size":11.5, fill:C.green, "font-weight":600 });
+  el("rect", { x:xt(12, 0), y:T - 10, width:xt(13, 0) - xt(12, 0), height:H - B - T + 10, fill:"#f3f6fa" }, svg);
+  tx(svg, (xt(12, 0) + xt(13, 0)) / 2, T + 6, "점심", { class:"ax", "text-anchor":"middle" });
+  [0, 1, 2, 3, 4].forEach(v => { el("line", { x1:L, x2:1000 - Rr, y1:ys(v), y2:ys(v), class:"gridl" }, svg); tx(svg, L - 8, ys(v) + 4, v, { class:"ax", "text-anchor":"end" }); });
+  el("line", { x1:L, x2:1000 - Rr, y1:ys(0), y2:ys(0), stroke:C.ink }, svg);
+  G_BINS.forEach((v, i) => {
+    const x = L + i * bw;
+    if (v) growY(el("rect", { x:x + 1.5, y:ys(v), width:bw - 3, height:ys(0) - ys(v), fill:C.blue }, svg), ys(0), 0.2 + i * 0.012);
+    else el("line", { x1:x + 2, x2:x + bw - 2, y1:ys(0) - 2 + (i % 2) * 4, y2:ys(0) + 2 - (i % 2) * 4, stroke:C.dim }, svg);
+  });
+  for (let h = 7; h <= 18; h++) tx(svg, xt(h, 0), H - B + 20, String(h).padStart(2, "0") + ":00", { class:"ax", "text-anchor":"middle" });
+  G_TRUCKS.forEach(([h, m, lab], k) => {
+    const x = xt(h, m), g = fadeIn(el("g", null, svg), 0.6 + k * 0.15);
+    const ly = T - 40 - (k % 2) * 16;
+    el("path", { d:`M${x - 7} ${T - 34} h14 l-7 10z`, fill:C.amber }, g);
+    el("line", { x1:x, x2:x, y1:ly + 4, y2:H - B, stroke:C.amber, "stroke-dasharray":"2 3" }, g);
+    tx(g, x + 4, ly, `${h}:${String(m).padStart(2, "0")} ${lab}`, { "font-size":10.5, fill:C.amber, "font-weight":600 });
+  });
+  const idle = el("g", { class:"fade-in", style:"animation-delay:1.3s" }, svg);
+  el("path", { d:`M${xt(7, 30)} ${ys(0) + 30} H${xt(10, 20)}`, stroke:C.red, "stroke-width":2 }, idle);
+  el("path", { d:`M${xt(7, 30)} ${ys(0) + 25} v10 M${xt(10, 20)} ${ys(0) + 25} v10`, stroke:C.red, "stroke-width":2 }, idle);
+  return null;
+}
+
+function gSlot(){
+  const items = [
+    { id:"gSlot", lab:"자재 반입 시간 예약제", note:"공급사가 크레인 계획 시간에 맞춰 반입 슬롯을 예약합니다.", fx:{ "자재 미도착 대기":.7 } },
+    { id:"gSig", lab:"신호수 2인 교대 배치", note:"점심과 휴식 시간에도 신호수 공백이 생기지 않게 합니다.", fx:{ "신호수 부재":.8 } },
+    { id:"gPre", lab:"자재 선인양 · 야적 계획", note:"전날 오후에 다음 날 오전 자재를 미리 올려 둡니다.", fx:{ "자재 미도착 대기":.2, "기타":.5 } },
+    { id:"gWind", lab:"풍속 예보 연동 작업 재배치", note:"강풍 예보 시간에는 지상 작업을 배치합니다.", fx:{ "풍속 작업중지":.4 } }
+  ];
+  body.innerHTML = `
+    <div class="sim">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">가동률 개선 대책</span></div>
+        ${items.map((it, i) => `<div class="ctl"${i === items.length - 1 ? ' style="border-bottom:0"' : ""}><label class="tg" for="${it.id}"><span class="ctl-head" style="flex:1"><b>${it.lab}</b><span>${Object.entries(it.fx).map(([k, v]) => `${k.split(" ")[0]} −${Math.round(v * 100)}%`).join(" · ")}</span></span><input type="checkbox" id="${it.id}"><span class="sl"></span></label><p>${it.note}</p></div>`).join("")}
+        <div class="sim-actions"><button class="btn" type="button" id="gAll">전체 적용</button><button class="btn" type="button" id="gReset">초기화</button></div>
+      </div>
+      <div class="panel result">
+        <div class="panel-head" style="margin:0"><span class="eyebrow">남은 골조 · 철골 인양 ${G_NEED.toLocaleString("ko-KR")}시간 기준</span></div>
+        <svg id="g4" class="tl" viewBox="0 0 520 250" role="img" aria-label="개선 후 크레인 가동률 게이지"></svg>
+        <div class="ledger">
+          <div>필요 임대 일수</div><div id="gD">—</div>
+          <div>현 추세 대비 단축</div><div id="gS">—</div>
+          <div class="tot">임대 · 운전원 비용 절감</div><div class="tot" id="gW">—</div>
+        </div>
+        <div class="hint" id="gHint"></div>
+      </div>
+    </div>`;
+  const svg = $("g4"), days = u => Math.ceil(G_NEED / (10 * u)), d0 = days(G_UTIL);
+  function update(){
+    const red = {};
+    items.forEach(it => { if ($(it.id).checked) Object.entries(it.fx).forEach(([k, v]) => { red[k] = Math.min(.95, (red[k] || 0) + v); }); });
+    const gain = G_LOST.reduce((s, x) => s + x.h * (red[x.k] || 0), 0);
+    const u = Math.min(.9, G_UTIL + gain / G_AVAIL), d = days(u);
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    gauge(svg, 260, 175, 130, u, u >= .6 ? C.green : u >= .5 ? C.amber : C.red, Math.round(u * 100) + "%", `현재 ${Math.round(G_UTIL * 100)}% · 목표 60%`);
+    $("gD").textContent = d + "일";
+    $("gS").textContent = d0 - d > 0 ? `−${d0 - d}일` : "변화 없음";
+    $("gS").style.color = d0 - d > 0 ? "var(--green)" : "";
+    $("gW").textContent = ((d0 - d) * CRANE_DAY / 10000).toFixed(2) + "억";
+    $("gHint").innerHTML = d0 - d > 0 ? `임대 기간이 ${d0 - d}일 줄면 사건 A의 공기 만회에도 그대로 도움이 됩니다. 크레인이 골조의 속도를 정하기 때문입니다.` : `가장 큰 한 수는 <b style="color:var(--fg)">자재 반입 시간 예약제</b>입니다. 관리 가능 손실의 절반 이상이 자재 대기입니다.`;
+  }
+  items.forEach(it => $(it.id).addEventListener("change", update));
+  $("gAll").addEventListener("click", () => { items.forEach(it => { $(it.id).checked = true; }); update(); });
+  $("gReset").addEventListener("click", () => { items.forEach(it => { $(it.id).checked = false; }); update(); });
+  update();
+  return null;
+}
+
+const SCENES_G = [
+  { label:"가동 시계", title:"타워크레인 가동 시계", meta:`W10–W${NOW_W} · 요일 6 × 시간 12`, scan:"장비 운행 기록 로드 중", render:gClock,
+    say:`소장님, 이번엔 타워크레인이에요. 임대료는 하루 종일 내는데 실제로 일한 건 [[${Math.round(G_UTIL * 100)}%]]뿐이에요. 시계를 보시면 [[오전 7시와 오후 늦게]] 빨간 칸이 몰려 있어요. 크레인이 기다리는 시간이 일하는 시간보다 길어요.`,
+    log:`크레인 가동률 ${Math.round(G_UTIL * 100)}% · 가용 ${G_AVAIL}h 중 ${G_WORK}h` },
+  { label:"잃어버린 시간", title:"잃어버린 시간의 행방", meta:`가용 ${G_AVAIL}h 분해`, scan:"대기 사유 분류 중", render:gTree,
+    say:`멈춘 시간을 사유별로 쪼개 봤어요. 가장 큰 덩어리는 [[자재 미도착 대기 ${G_LOST[0].h}시간]]이에요. 레미콘 중단 대기는 어쩔 수 없었다 쳐도, 자재와 신호수, 풍속 손실 [[${G_CTL}시간]]은 관리로 줄일 수 있었어요.`,
+    log:`관리 가능 손실 ${G_CTL}h · 자재 대기 ${G_LOST[0].h}h` },
+  { label:"하루 감식", title:"결정적 증거 · 어느 수요일의 지진계", meta:`${ymd(G_DAY)} · 10분 단위 인양 기록`, scan:"인양 로그 재생 중", render:gSeismo,
+    say:`10월 14일 하루를 10분 단위로 펼쳐 봤어요. 계획은 [[오전 7시 30분부터 철근 인양]]이었는데, 첫 철근 차량이 [[10시 20분]]에 왔어요. 차가 오면 몰아서 올리고, 없으면 멈춰요. 크레인은 공급사의 시계에 맞춰 돌고 있었던 거예요.`,
+    log:`10.14 첫 차량 10:20 · 오전 ${G_MORNING_IDLE}분 대기` },
+  { label:"반입 슬롯", title:"크레인 시간 되찾기", meta:`대책 4개 · 임대 일수 계산`, scan:"반입 슬롯 시뮬레이션 중", render:gSlot,
+    say:`대책을 켜 보시면 가동률과 남은 임대 일수가 바로 바뀌어요. 핵심은 [[자재 반입 시간 예약제]]예요. 크레인이 공급사를 기다리는 게 아니라, 공급사가 크레인 시간에 맞추게 하는 거죠.`,
+    log:`반입 슬롯 시뮬레이션 · 목표 가동률 60%` }
+];
+
+/* ======================== CASE H : NEIGHBORS / ENVIRONMENT ======================== */
+const RH = rng(8080);
+const H_W = [1,0,1,2,1,1,2,1,2,1,2,1,2,1,0,1,5,7,6,5,5];
+const H_REC = [ { k:"북측 아파트 단지", d:40, x:320, y:62, w:.55 }, { k:"남측 상가", d:60, x:320, y:392, w:.32 }, { k:"동측 초등학교", d:120, x:575, y:230, w:.13 } ];
+const H_EV = [];
+H_W.forEach((n, i) => { for (let k = 0; k < n; k++){ const late = i >= 16; const day = late && RH() < .58 ? 5 : Math.floor(RH() * 6); H_EV.push({ w:i + 1, day, rec:pickW2(H_REC.map(r => r.w)) }); } });
+function pickW2(ws){ const t = ws.reduce((a, b) => a + b, 0); let r = RH() * t; for (let i = 0; i < ws.length; i++){ r -= ws[i]; if (r <= 0) return i; } return ws.length - 1; }
+const H_N = H_EV.length, H_SAT = H_EV.filter(e => e.day === 5).length, H_LATE_SAT = H_EV.filter(e => e.day === 5 && e.w >= 17).length;
+const H_REC_N = H_REC.map((r, i) => H_EV.filter(e => e.rec === i).length);
+const H_EXCEED = 9, H_LIMIT = 65;
+const H_DAY = new Date(2026, 9, 17);
+const H_NOISE = Array.from({ length:66 }, (_, i) => {
+  const t = 7 * 60 + i * 10; let v = 57 + RH() * 4;
+  if (t >= 12 * 60 && t < 13 * 60) v = 52 + RH() * 2;
+  if (t >= 10 * 60 && t < 10 * 60 + 40) v = 68 + RH() * 4;
+  if (t >= 13 * 60 + 30 && t < 16 * 60 + 30) v = 66 + RH() * 7;
+  return v;
+});
+const H_CALLS = [[10,15],[14,5],[14,40],[15,20],[16,0]];
+const H_PEAK = Math.max(...H_NOISE), H_DAY_EX = H_NOISE.filter(v => v > H_LIMIT).length;
+
+function hMap(){
+  body.innerHTML = kpiRow([["누적 민원", H_N, "건", "warn"], ["토요일 민원", H_SAT, "건", "crit"], ["소음 기준 초과 측정", H_EXCEED, "회", "crit"], ["최대 측정 소음", H_PEAK.toFixed(1), "dB", "", C.red]]) + `
+    <div class="s1-grid">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">소리의 지도 · 등소음선과 민원 위치</span><div class="legend"><span style="color:var(--red)">◯ 70dB</span><span style="color:var(--amber)">◯ 65dB</span><span style="color:var(--blue)">◯ 60dB</span></div></div>
+        <div class="chart-scroll"><svg id="h1" viewBox="0 0 640 440" role="img" aria-label="현장 주변 소음 등고선과 민원 발생 위치"></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">민원 발생지</span></div>
+        <div style="display:flex;flex-direction:column;gap:12px">${H_REC.map((r, i) => evCard({ t:`${r.k} · ${r.d}m`, chip:i === 0 ? "최다" : `${Math.round(H_REC_N[i] / H_N * 100)}%`, cc:i === 0 ? "crit" : "mute", v:H_REC_N[i] + "건", vc:i === 0 ? undefined : C.ink, p:i === 0 ? "65dB 등소음선 안쪽에 들어가는 유일한 주거지입니다." : i === 1 ? "펌프카 대기 위치와 가장 가깝습니다." : "수업 시간대 민원이 대부분입니다.", key:i === 0 })).join("")}</div>
+      </div>
+    </div>`;
+  const svg = $("h1"), cx = 320, cy = 230;
+  el("rect", { x:0, y:0, width:640, height:440, fill:"#fbfcfe" }, svg);
+  [["M0 140 H640", 18], ["M0 320 H640", 18], ["M460 0 V440", 16]].forEach(([d, w]) => el("path", { d, stroke:"#e6ebf2", "stroke-width":w }, svg));
+  [[220, C.blue, "60dB"], [150, C.amber, "65dB"], [90, C.red, "70dB"]].forEach(([r, c, lab], k) => {
+    el("ellipse", { cx, cy, rx:r * 1.15, ry:r * .82, fill:c, "fill-opacity":.05, stroke:c, "stroke-width":1.5, "stroke-dasharray":"6 4" }, svg);
+    tx(svg, cx + r * 1.15 - 6, cy - 4, lab, { "font-size":11, fill:c, "font-weight":600, "text-anchor":"end" });
+    if (!reduced){ const pl = el("ellipse", { cx, cy, rx:r * 1.15, ry:r * .82, fill:"none", stroke:c, "stroke-width":2, class:"pulse", style:`animation-delay:${k * .6}s` }, svg); }
+  });
+  el("rect", { x:cx - 80, y:cy - 52, width:160, height:104, fill:"#ffffff", stroke:C.ink, "stroke-width":2 }, svg);
+  tx(svg, cx, cy + 5, "현장", { "text-anchor":"middle", "font-size":14, fill:C.ink, "font-weight":700, "font-family":KR });
+  el("rect", { x:cx - 70, y:cy + 58, width:40, height:20, fill:C.amber }, svg);
+  tx(svg, cx - 50, cy + 72, "펌프카", { "text-anchor":"middle", "font-size":10, fill:"#ffffff", "font-weight":700, "font-family":KR });
+  H_REC.forEach((r, i) => {
+    const bw2 = i === 2 ? 70 : 200, bh = i === 2 ? 110 : 44;
+    el("rect", { x:r.x - bw2 / 2, y:r.y - bh / 2, width:bw2, height:bh, fill:"#e3eefa", stroke:C.blue }, svg);
+    if (i === 0) for (let k = 0; k < 4; k++) el("rect", { x:r.x - 90 + k * 48, y:r.y - 16, width:36, height:32, fill:"#ffffff", stroke:C.blue }, svg);
+    tx(svg, r.x, r.y + (i === 2 ? 0 : 4) + (i === 0 ? -26 : 0), r.k, { "text-anchor":"middle", "font-size":11.5, fill:C.ink, "font-weight":600, "font-family":KR });
+    const px = r.x + (i === 2 ? 0 : 90), py = r.y - bh / 2 - 6;
+    const pin = fadeIn(el("g", null, svg), .4 + i * .2);
+    el("path", { d:`M${px} ${py} c-12 -14 -14 -20 -14 -26 a14 14 0 0 1 28 0 c0 6 -2 12 -14 26z`, fill:i === 0 ? C.red : C.amber }, pin);
+    tx(pin, px, py - 22, H_REC_N[i], { "text-anchor":"middle", "font-size":12, fill:"#ffffff", "font-weight":700 });
+  });
+  return null;
+}
+
+function hCal(){
+  const mx = Math.max(1, ...H_W.map((_, w) => Math.max(...WDAY.map((d, di) => H_EV.filter(e => e.w === w + 1 && e.day === di).length))));
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">민원 달력 · W1–W${NOW_W} × 요일</span><div class="legend"><span style="color:var(--amber)">■ 민원</span><span style="color:var(--red)">◆ 재해 발생일 (사건 C)</span></div></div>
+      <div class="chart-scroll"><svg id="h2" viewBox="0 0 1000 330" role="img" aria-label="주차와 요일별 민원 달력"></svg></div>
+    </div>
+    <div class="ev-grid">
+      ${evCard({ t:"토요일 민원", chip:`전체의 ${Math.round(H_SAT / H_N * 100)}%`, cc:"warn", v:H_SAT + "건", vc:C.amber, p:"작업일 6일 중 하루인데 민원이 몰립니다." })}
+      ${evCard({ t:"W17 이후 토요일", chip:"만회 작업", cc:"crit", v:H_LATE_SAT + "건", p:"공기 만회로 토요일 연장 작업이 시작된 뒤부터입니다.", key:true })}
+      ${evCard({ t:"사건 C와 같은 날", chip:"재해 2건", cc:"crit", v:"토요일 오후", vc:C.red, p:"민원이 쏟아진 토요일 오후에 재해도 났습니다. 같은 원인, 다른 피해입니다." })}
+    </div>`;
+  const svg = $("h2"), L = 60, T = 30, cw = (1000 - L - 20) / NOW_W, ch = 38;
+  WDAY.forEach((d, r) => tx(svg, L - 12, T + r * ch + ch / 2 + 5, d, { "text-anchor":"end", "font-size":13, fill:r === 5 ? C.red : C.ink, "font-weight":r === 5 ? 700 : 500, "font-family":KR }));
+  el("rect", { x:L - 2, y:T + 5 * ch - 2, width:NOW_W * cw + 4, height:ch + 4, fill:"none", stroke:C.red, "stroke-width":1.5, "stroke-dasharray":"5 4" }, svg);
+  for (let w = 1; w <= NOW_W; w++){
+    WDAY.forEach((d, r) => {
+      const n = H_EV.filter(e => e.w === w && e.day === r).length, x = L + (w - 1) * cw, y = T + r * ch;
+      fadeIn(el("rect", { x:x + 2, y:y + 2, width:cw - 4, height:ch - 4, fill:n ? C.amber : "#f3f6fa", "fill-opacity":n ? .25 + n / mx * .75 : 1 }, svg), (w * 6 + r) * 0.004);
+      if (n > 1) tx(svg, x + cw / 2, y + ch / 2 + 5, n, { "text-anchor":"middle", "font-size":12, fill:"#ffffff", "font-weight":700 });
+    });
+    if (w % 2 === 1) tx(svg, L + (w - 1) * cw + cw / 2, T + 6 * ch + 20, "W" + w, { class:"ax", "text-anchor":"middle" });
+  }
+  SERIOUS.forEach((s, k) => {
+    const x = L + (s.w - 1) * cw + cw / 2, y = T + s.day * ch + ch / 2;
+    const g = fadeIn(el("g", null, svg), .8 + k * .2);
+    el("path", { d:`M${x} ${y - 11} L${x + 11} ${y} L${x} ${y + 11} L${x - 11} ${y}Z`, fill:"none", stroke:C.red, "stroke-width":2.5 }, g);
+  });
+  return null;
+}
+
+function hNoise(){
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">${ymd(H_DAY)} (토) · 10분 등가소음도 Leq</span><div class="legend"><span style="color:var(--fg)">━ 측정 소음</span><span style="color:var(--red)">┅ 기준 ${H_LIMIT}dB</span><span style="color:var(--amber)">● 민원 전화</span></div></div>
+      <div class="chart-scroll"><svg id="h3" viewBox="0 0 1000 360" role="img" aria-label="토요일 하루 소음 측정 기록과 민원 전화 시각"></svg></div>
+    </div>
+    <div class="ev-grid">
+      ${evCard({ t:"기준 초과 구간", chip:`${H_DAY_EX * 10}분`, cc:"crit", v:H_DAY_EX + "회", p:"브레이커 작업과 펌프카 타설 시간에 정확히 겹칩니다.", key:true })}
+      ${evCard({ t:"민원 전화까지", chip:"평균 시차", cc:"warn", v:"약 15분", vc:C.amber, p:"소음이 기준을 넘고 15분쯤 지나면 전화가 옵니다." })}
+      ${evCard({ t:"최대 소음", chip:"펌프카 타설", cc:"mute", v:H_PEAK.toFixed(1) + "dB", vc:C.red, p:"오후 내내 이어진 타설이 주범입니다." })}
+    </div>`;
+  const svg = $("h3"), L = 50, Rr = 16, T = 40, H = 360, B = 50, n = H_NOISE.length, bw = (1000 - L - Rr) / n;
+  const xt = (h, m) => L + ((h - 7) * 60 + m) / 10 * bw, ys = v => T + (1 - (v - 45) / 35) * (H - T - B);
+  [["브레이커", 10, 0, 10, 40], ["펌프카 타설", 13, 30, 16, 30]].forEach(([lab, h1, m1, h2, m2]) => {
+    el("rect", { x:xt(h1, m1), y:T - 20, width:xt(h2, m2) - xt(h1, m1), height:H - B - T + 20, fill:"rgba(217,119,6,.08)" }, svg);
+    tx(svg, xt(h1, m1) + 6, T - 6, lab, { "font-size":11.5, fill:C.amber, "font-weight":600, "font-family":KR });
+  });
+  [45, 55, 65, 75].forEach(v => { el("line", { x1:L, x2:1000 - Rr, y1:ys(v), y2:ys(v), class:"gridl" }, svg); tx(svg, L - 8, ys(v) + 4, v, { class:"ax", "text-anchor":"end" }); });
+  el("line", { x1:L, x2:1000 - Rr, y1:ys(H_LIMIT), y2:ys(H_LIMIT), stroke:C.red, "stroke-width":1.5, "stroke-dasharray":"6 4" }, svg);
+  tx(svg, 1000 - Rr, ys(H_LIMIT) - 6, `주간 기준 ${H_LIMIT}dB`, { class:"ax", fill:C.red, "text-anchor":"end" });
+  const pts3 = H_NOISE.map((v, i) => [L + i * bw + bw / 2, ys(v)]);
+  el("path", { d:pts(pts3) + `L${pts3[n - 1][0]} ${ys(45)} L${pts3[0][0]} ${ys(45)}Z`, fill:"rgba(15,29,51,.06)" }, svg);
+  const ln = el("path", { d:pts(pts3), fill:"none", stroke:C.ink, "stroke-width":2 }, svg);
+  drawIn(ln, 0.1);
+  pts3.forEach((p, i) => { if (H_NOISE[i] > H_LIMIT) el("circle", { cx:p[0], cy:p[1], r:3, fill:C.red }, svg); });
+  for (let h = 7; h <= 18; h++) tx(svg, xt(h, 0), H - B + 20, String(h).padStart(2, "0") + ":00", { class:"ax", "text-anchor":"middle" });
+  H_CALLS.forEach(([h, m], k) => {
+    const x = xt(h, m), g = fadeIn(el("g", null, svg), 1 + k * .15);
+    el("line", { x1:x, x2:x, y1:ys(45), y2:ys(80) + 4, stroke:C.amber, "stroke-dasharray":"2 3" }, g);
+    el("circle", { cx:x, cy:ys(80) + 4, r:7, fill:C.amber }, g);
+    tx(g, x, ys(80) + 8, "☎", { "text-anchor":"middle", "font-size":9, fill:"#ffffff" });
+  });
+  return null;
+}
+
+function hDeal(){
+  const satRisk = Math.round(HOT_E_SHARE * 60);
+  const items = [
+    { id:"hSat", lab:"토요일 오후 작업 제한", note:"사건 C의 '토요일 15시 이후 고소작업 금지'와 같은 대책입니다.", c:.45, db:0, co:`사건 C 사고 위험 −${satRisk}%` },
+    { id:"hWall", lab:"북측 방음벽 3m 증고", note:"아파트 단지 쪽 가설 방음벽을 높입니다.", c:.2, db:4, co:"" },
+    { id:"hPump", lab:"저소음 펌프카 · 대기 위치 변경", note:"펌프카를 남측 상가에서 먼 서측으로 옮깁니다.", c:.15, db:5, co:"" },
+    { id:"hNotice", lab:"주민 사전 공지 · 소통 창구", note:"타설과 소음 작업 일정을 하루 전에 문자로 알립니다.", c:.25, db:0, co:"" }
+  ];
+  const base = avg(H_W.slice(-5)) * 8;
+  body.innerHTML = `
+    <div class="sim">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">이웃과의 협상 카드</span></div>
+        ${items.map((it, i) => `<div class="ctl"${i === items.length - 1 ? ' style="border-bottom:0"' : ""}><label class="tg" for="${it.id}"><span class="ctl-head" style="flex:1"><b>${it.lab}</b><span>민원 −${Math.round(it.c * 100)}%${it.db ? ` · −${it.db}dB` : ""}</span></span><input type="checkbox" id="${it.id}"><span class="sl"></span></label><p>${it.note}${it.co ? ` <b style="color:var(--green)">${it.co}</b>` : ""}</p></div>`).join("")}
+        <div class="sim-actions"><button class="btn" type="button" id="hAll">전체 적용</button><button class="btn" type="button" id="hReset">초기화</button></div>
+      </div>
+      <div class="panel result">
+        <div class="panel-head" style="margin:0"><span class="eyebrow">다음 8주 예상 민원</span></div>
+        <div class="fc"><div class="date" id="hVal">—</div><span class="chip" id="hChip">—</span></div>
+        <svg id="h4" class="tl" viewBox="0 0 520 150" role="img" aria-label="예상 최대 소음과 기준 비교"></svg>
+        <div class="hint" id="hHint"></div>
+      </div>
+    </div>`;
+  const svg = $("h4");
+  function update(){
+    let f = 1, db = 0; const on = items.filter(it => $(it.id).checked);
+    on.forEach(it => { f *= 1 - it.c; db += it.db; });
+    const v = base * f, peak = H_PEAK - db;
+    $("hVal").textContent = v.toFixed(0) + "건";
+    $("hVal").style.color = f < .99 ? "var(--green)" : "var(--amber)";
+    $("hChip").className = "chip " + (f < .99 ? "ok" : "warn");
+    $("hChip").textContent = f < .99 ? `현 추세 ${base.toFixed(0)}건 대비 −${Math.round((1 - f) * 100)}%` : "현 추세";
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    const xs = d => 20 + (d - 50) / 30 * 480;
+    tx(svg, 20, 22, "예상 최대 소음", { "font-size":12.5, fill:C.ink, "font-weight":600, "font-family":KR });
+    el("rect", { x:20, y:36, width:480, height:34, fill:"#f3f6fa" }, svg);
+    el("rect", { x:20, y:36, width:xs(peak) - 20, height:34, fill:peak > H_LIMIT ? C.red : C.green, "fill-opacity":.85, style:"transition:width .4s" }, svg);
+    el("line", { x1:xs(H_LIMIT), x2:xs(H_LIMIT), y1:28, y2:78, stroke:C.ink, "stroke-width":2 }, svg);
+    tx(svg, xs(H_LIMIT), 94, `기준 ${H_LIMIT}dB`, { "text-anchor":"middle", class:"ax", fill:C.ink });
+    tx(svg, xs(peak) - 8, 58, peak.toFixed(1) + "dB", { "text-anchor":"end", "font-size":13, fill:"#ffffff", "font-weight":700 });
+    [50, 60, 70, 80].forEach(d => tx(svg, xs(d), 120, d, { class:"ax", "text-anchor":"middle" }));
+    $("hHint").innerHTML = $("hSat").checked ? `토요일 오후 제한은 민원과 사고를 <b style="color:var(--fg)">동시에</b> 줄이는 한 수입니다. 사건 C와 H가 같은 원인에서 나왔기 때문입니다.` : peak > H_LIMIT ? `저소음 장비와 방음벽을 모두 써야 최대 소음이 기준 아래로 내려갑니다.` : `최대 소음이 기준 아래로 내려왔습니다.`;
+  }
+  items.forEach(it => $(it.id).addEventListener("change", update));
+  $("hAll").addEventListener("click", () => { items.forEach(it => { $(it.id).checked = true; }); update(); });
+  $("hReset").addEventListener("click", () => { items.forEach(it => { $(it.id).checked = false; }); update(); });
+  update();
+  return null;
+}
+
+const SCENES_H = [
+  { label:"소리의 지도", title:"소리의 지도", meta:`민원 ${H_N}건 · 수음점 3곳`, scan:"민원 접수 기록 로드 중", render:hMap,
+    say:`소장님, 담장 밖 이야기예요. 민원이 [[${H_N}건]] 들어왔는데, 절반 넘게 [[북측 아파트 단지]]예요. 40미터 거리라 65dB 등소음선 안에 들어가요. 소음 기준 초과 측정도 ${H_EXCEED}회 있었어요.`,
+    log:`민원 ${H_N}건 · 북측 아파트 ${H_REC_N[0]}건 · 초과 측정 ${H_EXCEED}회` },
+  { label:"민원 달력", title:"민원 달력", meta:`W1–W${NOW_W} × 요일`, scan:"날짜별 민원 정렬 중", render:hCal,
+    say:`달력에 찍어 보면 [[토요일 줄]]이 타올라요. 특히 17주차 이후 토요일이에요. 그리고 빨간 마름모가 사건 C의 재해 발생일인데, [[같은 토요일 오후]]에 민원도 쏟아졌어요. 같은 원인, 다른 피해예요.`,
+    log:`토요일 민원 ${H_SAT}건 · 재해일과 겹침` },
+  { label:"소음 기록", title:"결정적 증거 · 토요일의 소음 기록", meta:`${ymd(H_DAY)} · 10분 Leq`, scan:"소음 측정 데이터 재생 중", render:hNoise,
+    say:`10월 17일 토요일 소음 기록이에요. 브레이커 작업과 펌프카 타설 시간에 [[기준 ${H_LIMIT}dB를 넘었고]], 넘고 나서 15분쯤 지나면 어김없이 민원 전화가 와요. 소음이 원인이고 전화는 결과예요.`,
+    log:`10.17 기준 초과 ${H_DAY_EX}회 · 최대 ${H_PEAK.toFixed(1)}dB` },
+  { label:"협상 카드", title:"이웃과의 협상 카드", meta:`대책 4개 · 민원 · 소음 예측`, scan:"민원 예측 계산 중", render:hDeal,
+    say:`대책을 켜 보세요. 재미있는 건 [[토요일 오후 작업 제한]]이에요. 민원도 줄이고 사건 C의 사고 위험도 같이 줄여요. 하나의 결정으로 두 사건을 막는 거예요.`,
+    log:`협상 카드 시뮬레이션 · 토요일 제한 = C · H 동시 해결` }
+];
+
+/* ======================== CASE I : CASH FLOW ======================== */
+const ADV = CONTRACT * 0.2;
+const MONTHS = [
+  { m:"6월", end:new Date(2026, 5, 30) }, { m:"7월", end:new Date(2026, 6, 31) }, { m:"8월", end:new Date(2026, 7, 31) },
+  { m:"9월", end:new Date(2026, 8, 30) }, { m:"10월", end:new Date(2026, 9, 31) }
+];
+const weekOf = d => Math.min(NOW_W, Math.max(1, Math.floor(dayDiff(START, d) / 7) + 1));
+let prevEV = 0;
+MONTHS.forEach((mo, i) => {
+  const w = weekOf(mo.end), ev = EVc[w] + (EVc[Math.min(NOW_W, w + 1)] - EVc[w]) * ((dayDiff(START, mo.end) % 7) / 7);
+  mo.claim = (ev - prevEV) * CONTRACT / BAC * 0.9; prevEV = ev;
+  mo.req = addDays(mo.end, 5);
+  const delay = i === 3 ? 21 : 0;
+  mo.appr = addDays(mo.req, 7 + delay);
+  mo.hold = i === 4 ? 0.37 : 0;
+  mo.pay = addDays(mo.appr, 7);
+  mo.paid = mo.claim * (1 - mo.hold);
+  mo.lateDays = delay;
+});
+const HOLD_AMT = MONTHS[4].claim * MONTHS[4].hold;
+const HOLD_R = [
+  { k:"품질 부적합 미조치 (3F)", case:"D", f:.42, c:C.amber },
+  { k:"압축강도 판정 보류 (B사)", case:"D", f:.24, c:C.red },
+  { k:"설계변경 미확정", case:"E", f:.22, c:C.teal },
+  { k:"기성 서류 미비", case:"-", f:.12, c:C.dim }
+];
+HOLD_R.forEach(h => { h.v = HOLD_AMT * h.f; });
+const cashIn = w => { const d = weekEnd(w); let s = ADV; MONTHS.forEach(mo => { if (mo.pay <= d) s += mo.paid; }); return s; };
+const CASH = Array.from({ length:NOW_W + 1 }, (_, w) => ({ w, out:ACc[w] || 0, inn:w === 0 ? 0 : cashIn(w) }));
+CASH.forEach(c => { c.gap = c.inn - c.out; });
+const GAP_MIN = CASH.reduce((m, c) => c.gap < m.gap ? c : m, CASH[0]);
+const FIN_RATE = 0.055;
+function cashForecast(opt){
+  const o = opt || {};
+  const burn = (ACc[NOW_W] - ACc[NOW_W - 4]) / 4;
+  const wOct = weekOf(MONTHS[4].pay) + (MONTHS[4].pay > weekEnd(NOW_W) ? 1 : 0);
+  const flows = {};
+  const add = (w, v) => { flows[w] = (flows[w] || 0) + v; };
+  add(wOct, MONTHS[4].paid);
+  if (o.ncr) add(wOct, HOLD_AMT * (HOLD_R[0].f + HOLD_R[1].f)); else add(NOW_W + 6, HOLD_AMT * (HOLD_R[0].f + HOLD_R[1].f));
+  if (o.chg) add(NOW_W + 3, HOLD_AMT * HOLD_R[2].f + CHG_OK * 0.45);
+  add(NOW_W + 3, HOLD_AMT * HOLD_R[3].f);
+  const novClaim = burn * 4.3 * CONTRACT / BAC * 0.9;
+  add(o.doc ? NOW_W + 2 : NOW_W + 5, novClaim);
+  let gap = CASH[NOW_W].gap; const weeks = [];
+  for (let w = NOW_W + 1; w <= NOW_W + 8; w++){ gap += (flows[w] || 0) - burn; weeks.push({ w, gap }); }
+  const min = Math.min(...weeks.map(x => x.gap));
+  const cost = weeks.reduce((s2, x) => s2 + Math.max(0, -x.gap) * FIN_RATE / 52, 0);
+  return { weeks, min, cost };
+}
+const CF0 = cashForecast({});
+
+function iValley(){
+  body.innerHTML = kpiRow([["선급금 (20%)", ADV.toFixed(1), "억"], ["누적 지출", AC.toFixed(1), "억", "", C.red], ["누적 수입", cashIn(NOW_W).toFixed(1), "억", "", C.blue], ["자금 계곡 최저점", eok(GAP_MIN.gap, true).replace("억", ""), "억", "crit"]]) + `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">자금 계곡 · 누적 수입 vs 누적 지출 · W1–W${NOW_W}</span><div class="legend"><span style="color:var(--blue)">━ 누적 수입 (선급금 + 기성)</span><span style="color:var(--red)">━ 누적 지출</span><span style="color:var(--red)">▒ 자금 부족</span></div></div>
+      <div class="chart-scroll"><svg id="i1" viewBox="0 0 1000 360" role="img" aria-label="누적 수입과 누적 지출 비교 그래프"></svg></div>
+    </div>`;
+  const svg = $("i1"), L = 56, Rr = 20, T = 24, H = 360, B = 40, W = 1000;
+  const xs = w => L + w / NOW_W * (W - L - Rr), ymax = Math.ceil(AC / 50) * 50, ys = v => T + (1 - v / ymax) * (H - T - B);
+  for (let v = 0; v <= ymax; v += 50){ el("line", { x1:L, x2:W - Rr, y1:ys(v), y2:ys(v), class:"gridl" }, svg); tx(svg, L - 8, ys(v) + 4, v + "억", { class:"ax", "text-anchor":"end" }); }
+  for (let w = 0; w <= NOW_W; w += 3) tx(svg, xs(w), H - B + 20, "W" + w, { class:"ax", "text-anchor":"middle" });
+  const outP = CASH.map(c => [xs(c.w), ys(c.out)]);
+  const inStep = []; CASH.forEach((c, i) => { if (i) inStep.push([xs(c.w), ys(CASH[i - 1].inn)]); inStep.push([xs(c.w), ys(c.inn)]); });
+  // shade gap where out > in
+  const poly = [];
+  CASH.forEach(c => poly.push([xs(c.w), ys(Math.max(c.out, c.inn))]));
+  for (let i = CASH.length - 1; i >= 0; i--) poly.push([xs(CASH[i].w), ys(Math.min(CASH[i].out, CASH[i].inn))]);
+  CASH.forEach((c, i) => { if (i && c.out > c.inn) el("rect", { x:xs(c.w - 1), y:ys(c.out), width:xs(1) - xs(0), height:ys(c.inn) - ys(c.out), fill:"rgba(214,51,74,.10)" }, svg); });
+  const ip = el("path", { d:pts(inStep), fill:"none", stroke:C.blue, "stroke-width":2.6 }, svg);
+  const op = el("path", { d:pts(outP), fill:"none", stroke:C.red, "stroke-width":2.6 }, svg);
+  drawIn(ip, .1); drawIn(op, .2);
+  MONTHS.forEach(mo => { if (mo.pay <= weekEnd(NOW_W)){ const w = dayDiff(START, mo.pay) / 7; const g = fadeIn(el("g", null, svg), 1); el("circle", { cx:xs(w), cy:ys(cashIn(Math.ceil(w))), r:5, fill:"#ffffff", stroke:C.blue, "stroke-width":2 }, g); tx(g, xs(w), ys(cashIn(Math.ceil(w))) - 10, mo.m + " 기성", { "text-anchor":"middle", "font-size":11, fill:C.blue, "font-weight":600, "font-family":KR }); } });
+  const gm = GAP_MIN, g2 = fadeIn(el("g", null, svg), 1.2);
+  el("line", { x1:xs(gm.w), x2:xs(gm.w), y1:ys(gm.out), y2:ys(gm.inn), stroke:C.red, "stroke-width":2.5 }, g2);
+  el("path", { d:`M${xs(gm.w)} ${ys(gm.out)} L${xs(gm.w) - 40} ${ys(gm.out) - 40}`, stroke:C.red, "stroke-width":1.5 }, g2);
+  el("rect", { x:xs(gm.w) - 180, y:ys(gm.out) - 54, width:140, height:26, fill:C.red }, g2);
+  tx(g2, xs(gm.w) - 110, ys(gm.out) - 36, `최저 ${eok(gm.gap, true)} · W${gm.w}`, { "text-anchor":"middle", "font-size":12, fill:"#ffffff", "font-weight":700 });
+  return null;
+}
+
+function iGantt(){
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">월별 기성 · 청구 → 승인 → 입금</span><div class="legend"><span style="color:var(--blue)">■ 승인 대기</span><span style="color:var(--teal)">■ 입금 대기</span><span style="color:var(--red)">■ 지연 · 보류</span></div></div>
+      <div class="chart-scroll"><svg id="i2" viewBox="0 0 1000 330" role="img" aria-label="월별 기성 청구에서 입금까지 걸린 기간"></svg></div>
+    </div>
+    <div class="ev-grid">
+      ${evCard({ t:"평소 걸린 시간", chip:"계약 조건", cc:"ok", v:"14일", vc:C.green, p:"청구 후 승인 7일, 승인 후 지급 7일입니다." })}
+      ${evCard({ t:"9월 기성", chip:`승인 +${MONTHS[3].lateDays}일`, cc:"warn", v:"35일", vc:C.amber, p:"형틀팀 교체에 따른 노무비 증빙이 늦어 승인이 밀렸습니다." })}
+      ${evCard({ t:"10월 기성", chip:"부분 보류", cc:"crit", v:`${Math.round(MONTHS[4].hold * 100)}% 보류`, p:`청구 ${MONTHS[4].claim.toFixed(1)}억 중 ${HOLD_AMT.toFixed(1)}억이 묶였습니다.`, key:true })}
+    </div>`;
+  const svg = $("i2"), L = 90, Rr = 30, T = 40, rh = 52, W = 1000;
+  const t0 = new Date(2026, 6, 1).getTime(), t1 = new Date(2026, 11, 31).getTime();
+  const xs = d => L + (d.getTime() - t0) / (t1 - t0) * (W - L - Rr);
+  for (let m = 6; m <= 11; m++){ const d = new Date(2026, m, 1); el("line", { x1:xs(d), x2:xs(d), y1:T - 14, y2:T + MONTHS.length * rh, class:"gridl" }, svg); tx(svg, xs(d) + 4, T - 18, (m + 1) + "월", { class:"ax" }); }
+  const today = BASE_DATE; el("line", { x1:xs(today), x2:xs(today), y1:T - 24, y2:T + MONTHS.length * rh, stroke:C.ink, "stroke-dasharray":"4 3" }, svg);
+  tx(svg, xs(today) + 4, T + MONTHS.length * rh + 14, "기준일 " + md(today), { class:"ax", fill:C.ink });
+  MONTHS.forEach((mo, i) => {
+    const y = T + i * rh + 10, h = rh - 20;
+    tx(svg, 8, y + h / 2 + 5, mo.m + " 기성", { "font-size":13, fill:C.ink, "font-weight":600, "font-family":KR });
+    if (mo.req < new Date(2026, 6, 1)) { tx(svg, L, y + h / 2 + 5, "(선급금 정산 기간)", { class:"ax" }); return; }
+    const g = fadeIn(el("g", null, svg), .1 + i * .15);
+    const normA = addDays(mo.req, 7);
+    el("rect", { x:xs(mo.req), y, width:xs(normA) - xs(mo.req), height:h, fill:C.blue, "fill-opacity":.75 }, g);
+    if (mo.lateDays) el("rect", { x:xs(normA), y, width:xs(mo.appr) - xs(normA), height:h, fill:C.red, "fill-opacity":.8 }, g);
+    el("rect", { x:xs(mo.appr), y, width:xs(mo.pay) - xs(mo.appr), height:h, fill:C.teal, "fill-opacity":.75 }, g);
+    if (mo.hold){ el("rect", { x:xs(mo.pay), y, width:xs(new Date(2026, 11, 31)) - xs(mo.pay), height:h, fill:"url(#holdHatch)" }, g); tx(g, xs(mo.pay) + 8, y + h / 2 + 5, `${HOLD_AMT.toFixed(1)}억 보류 중`, { "font-size":12, fill:C.red, "font-weight":700, "font-family":KR }); }
+    tx(g, xs(mo.req) - 6, y + h / 2 + 5, mo.claim.toFixed(1) + "억", { "text-anchor":"end", "font-size":11.5, fill:C.ink, "font-weight":600 });
+  });
+  const defs = el("defs", null, svg), pat = el("pattern", { id:"holdHatch", width:8, height:8, patternUnits:"userSpaceOnUse", patternTransform:"rotate(45)" }, defs);
+  el("rect", { width:8, height:8, fill:"rgba(214,51,74,.08)" }, pat); el("line", { x1:0, y1:0, x2:0, y2:8, stroke:C.red, "stroke-width":2, "stroke-opacity":.5 }, pat);
+  return null;
+}
+
+function iHold(){
+  body.innerHTML = `
+    <div class="s1-grid" style="grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">10월 기성 보류 ${HOLD_AMT.toFixed(1)}억 · 사유별</span></div>
+        <svg id="i3" class="tl" viewBox="0 0 440 400" role="img" aria-label="기성 보류 사유 도넛 차트"></svg>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">보류 사유와 연결된 사건</span></div>
+        <div class="hold-list">${HOLD_R.map(h => `<div class="hold-row"><i style="background:${h.c}"></i><div><b>${h.k}</b><small>${h.case === "-" ? "단독 사유" : `사건 ${h.case}에서 이어짐`}</small></div><span>${h.v.toFixed(2)}억</span>${h.case !== "-" ? `<button type="button" class="jump" data-case="${h.case === "D" ? "quality" : "change"}">사건 ${h.case} 열기 →</button>` : `<span class="jump-none"></span>`}</div>`).join("")}</div>
+        <div class="hint" style="margin-top:14px">보류 금액의 <b style="color:var(--fg)">${Math.round((HOLD_R[0].f + HOLD_R[1].f) * 100)}%</b>가 품질(사건 D), ${Math.round(HOLD_R[2].f * 100)}%가 설계변경(사건 E)에서 왔습니다. 품질 하자는 준공 후가 아니라 <b style="color:var(--red)">지금 현금</b>을 묶고 있습니다.</div>
+      </div>
+    </div>`;
+  const svg = $("i3"), cx = 220, cy = 200, R = 150, r = 92;
+  let a = -Math.PI / 2;
+  HOLD_R.forEach((h, k) => {
+    const a2 = a + h.f * 2 * Math.PI, large = h.f > .5 ? 1 : 0;
+    const p = (rr, ang) => [cx + Math.cos(ang) * rr, cy + Math.sin(ang) * rr];
+    const [x1, y1] = p(R, a), [x2, y2] = p(R, a2), [x3, y3] = p(r, a2), [x4, y4] = p(r, a);
+    fadeIn(el("path", { d:`M${x1} ${y1} A${R} ${R} 0 ${large} 1 ${x2} ${y2} L${x3} ${y3} A${r} ${r} 0 ${large} 0 ${x4} ${y4}Z`, fill:h.c, stroke:"#ffffff", "stroke-width":3 }, svg), k * .15);
+    const [lx, ly] = p((R + r) / 2, (a + a2) / 2);
+    tx(svg, lx, ly + 5, Math.round(h.f * 100) + "%", { "text-anchor":"middle", "font-size":14, fill:"#ffffff", "font-weight":700 });
+    a = a2;
+  });
+  tx(svg, cx, cy - 4, HOLD_AMT.toFixed(1) + "억", { "text-anchor":"middle", "font-size":30, "font-weight":700, fill:C.red, "font-family":"Chakra Petch, sans-serif" });
+  tx(svg, cx, cy + 18, "10월 기성 보류", { "text-anchor":"middle", "font-size":12, fill:C.muted, "font-family":KR });
+  body.querySelectorAll(".jump").forEach(b => b.addEventListener("click", () => { try { history.replaceState(null, "", "#" + b.dataset.case); } catch (e) {} setCase(b.dataset.case); }));
+  return null;
+}
+
+function iRecover(){
+  const items = [
+    { id:"iNcr", lab:"3F 품질 부적합 조기 종결", note:"사건 D의 코어 판정과 보수를 먼저 끝내 보류분을 바로 풉니다.", eff:`보류 ${((HOLD_R[0].f + HOLD_R[1].f) * HOLD_AMT).toFixed(1)}억 조기 해제` },
+    { id:"iChg", lab:"설계변경 조기 확정", note:"사건 E의 청구 가능분을 먼저 확정해 기성에 반영합니다.", eff:`+${(CHG_OK * 0.45).toFixed(1)}억 조기 유입` },
+    { id:"iDoc", lab:"기성 서류 체크리스트 자동화", note:"노무비 · 자재 증빙을 매주 미리 모아 승인 지연을 없앱니다.", eff:"11월 기성 3주 앞당김" }
+  ];
+  body.innerHTML = `
+    <div class="sim">
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">자금 회복 대책</span></div>
+        ${items.map((it, i) => `<div class="ctl"${i === items.length - 1 ? ' style="border-bottom:0"' : ""}><label class="tg" for="${it.id}"><span class="ctl-head" style="flex:1"><b>${it.lab}</b><span>${it.eff}</span></span><input type="checkbox" id="${it.id}"><span class="sl"></span></label><p>${it.note}</p></div>`).join("")}
+        <div class="sim-actions"><button class="btn" type="button" id="iAll">전체 적용</button><button class="btn" type="button" id="iReset">초기화</button></div>
+      </div>
+      <div class="panel result">
+        <div class="panel-head" style="margin:0"><span class="eyebrow">향후 8주 자금 잔고 (수입 − 지출)</span><span class="eyebrow" style="color:var(--dim)">W${NOW_W + 1}–W${NOW_W + 8}</span></div>
+        <div class="fc"><div class="date" id="iVal">—</div><span class="chip" id="iChip">—</span></div>
+        <svg id="i4" class="tl" viewBox="0 0 560 230" role="img" aria-label="향후 8주 자금 잔고 막대"></svg>
+        <div class="ledger"><div>8주간 금융비용 (연 ${(FIN_RATE * 100).toFixed(1)}%)</div><div id="iCost">—</div><div>현 추세 대비</div><div id="iSave">—</div></div>
+      </div>
+    </div>`;
+  const svg = $("i4"), L = 50, Rr = 10, T = 16, H = 230, B = 34, bw = (560 - L - Rr) / 8;
+  function update(){
+    const r = cashForecast({ ncr:$("iNcr").checked, chg:$("iChg").checked, doc:$("iDoc").checked });
+    const lo = Math.min(-40, ...r.weeks.map(x => x.gap), ...CF0.weeks.map(x => x.gap)), hi = Math.max(10, ...r.weeks.map(x => x.gap));
+    const ys = v => T + (hi - v) / (hi - lo) * (H - T - B);
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    for (let v = Math.ceil(lo / 10) * 10; v <= hi; v += 10){ el("line", { x1:L, x2:560 - Rr, y1:ys(v), y2:ys(v), class:"gridl" }, svg); tx(svg, L - 8, ys(v) + 4, v, { class:"ax", "text-anchor":"end" }); }
+    el("line", { x1:L, x2:560 - Rr, y1:ys(0), y2:ys(0), stroke:C.ink }, svg);
+    r.weeks.forEach((x, i) => {
+      const bx = L + i * bw + bw * .18, w = bw * .64, b0 = CF0.weeks[i].gap;
+      el("rect", { x:bx, y:Math.min(ys(b0), ys(0)), width:w, height:Math.abs(ys(b0) - ys(0)), fill:"none", stroke:C.dim, "stroke-dasharray":"3 3" }, svg);
+      el("rect", { x:bx + 5, y:Math.min(ys(x.gap), ys(0)), width:w - 10, height:Math.abs(ys(x.gap) - ys(0)), fill:x.gap < 0 ? C.red : C.green, "fill-opacity":.85 }, svg);
+      tx(svg, bx + w / 2, H - B + 18, "W" + x.w, { class:"ax", "text-anchor":"middle" });
+    });
+    $("iVal").textContent = "최저 " + eok(r.min, true);
+    $("iVal").style.color = r.min < 0 ? "var(--red)" : "var(--green)";
+    $("iChip").className = "chip " + (r.min > CF0.min + .5 ? "ok" : "crit");
+    $("iChip").textContent = r.min > CF0.min + .5 ? `계곡 ${eok(r.min - CF0.min)} 얕아짐` : "현 추세";
+    $("iCost").textContent = manwon(r.cost * 10000);
+    const d = CF0.cost - r.cost;
+    $("iSave").textContent = d > .001 ? "−" + manwon(d * 10000) + " 절감" : "변화 없음";
+    $("iSave").style.color = d > .001 ? "var(--green)" : "";
+  }
+  items.forEach(it => $(it.id).addEventListener("change", update));
+  $("iAll").addEventListener("click", () => { items.forEach(it => { $(it.id).checked = true; }); update(); });
+  $("iReset").addEventListener("click", () => { items.forEach(it => { $(it.id).checked = false; }); update(); });
+  update();
+  return null;
+}
+
+const SCENES_I = [
+  { label:"자금 계곡", title:"자금 계곡", meta:`선급금 ${ADV.toFixed(1)}억 · 기성 ${MONTHS.length}회`, scan:"입출금 원장 로드 중", render:iValley,
+    say:`소장님, 마지막은 돈의 흐름이에요. 공사는 하는데 돈이 늦게 들어와요. 누적 지출이 수입을 넘어선 구간이 [[자금 계곡]]인데, 최저점이 [[W${GAP_MIN.w}, ${eok(GAP_MIN.gap, true)}]]이에요. 본사 자금으로 메우는 돈이에요.`,
+    log:`자금 계곡 최저 ${eok(GAP_MIN.gap, true)} (W${GAP_MIN.w})` },
+  { label:"기성 추적", title:"청구에서 입금까지", meta:`월별 기성 · 청구 → 승인 → 입금`, scan:"기성 처리 이력 추적 중", render:iGantt,
+    say:`평소엔 청구하고 2주면 돈이 들어왔어요. 그런데 [[9월 기성은 승인이 21일 밀렸고]], 10월 기성은 [[${Math.round(MONTHS[4].hold * 100)}%가 보류]]됐어요. 둘 다 이번 사건들이 터진 바로 그 시기예요.`,
+    log:`9월 승인 +21일 · 10월 ${HOLD_AMT.toFixed(1)}억 보류` },
+  { label:"보류 사유", title:"결정적 증거 · 묶인 돈의 이유", meta:`10월 기성 보류 사유 분해`, scan:"보류 사유서 대조 중", render:iHold,
+    say:`10월 보류 사유를 뜯어 보니 [[${Math.round((HOLD_R[0].f + HOLD_R[1].f) * 100)}%가 품질]]이에요. 3층 부적합과 B사 강도 판정이 안 끝나서 발주처가 돈을 묶었어요. 품질 하자는 준공 후의 문제가 아니라 [[지금 현금]]을 묶고 있어요.`,
+    log:`보류 ${Math.round((HOLD_R[0].f + HOLD_R[1].f) * 100)}% 품질 · ${Math.round(HOLD_R[2].f * 100)}% 설계변경` },
+  { label:"자금 회복", title:"계곡 메우기", meta:`대책 3개 · 8주 자금 예측`, scan:"자금 시나리오 계산 중", render:iRecover,
+    say:`대책을 켜 보세요. 사건 D의 [[품질 조치를 앞당기면 보류금이 풀리고]], 사건 E의 청구 가능분을 먼저 확정하면 돈이 더 빨리 들어와요. 다른 사건의 대책이 여기서는 [[현금]]이 돼요.`,
+    log:`자금 회복 시뮬레이션 · 품질 조치 = 현금 회수` }
+];
+
+/* ======================== TOOL : WATCH (EARLY WARNING) ======================== */
+const REM_W = SPI.map((_, i) => i < 13 ? 100 : [38, 2, 45, 86, 96, 98, 99, 98][i - 13]);
+const CR_W = SPI.map((_, i) => i < 13 ? .5 + (i % 3) * .02 : [.31, .12, .29, .45, .44, .43, .44, .44][i - 13]);
+const CHGPRE_W = SPI.map((_, i) => CHG.filter(c => c.w === i + 1 && c.lag > 0).length);
+const RBL_W = SPI.map((_, i) => i + 1 < RB_W0 ? LOSS_PLAN : RB_L[i + 1 - RB_W0]);
+const BIL_W = SPI.map((_, i) => [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,14,21,21,0][i]);
+const SAT_W = SPI.map((_, i) => i < 16 ? 8 + (i % 3) : [24, 23, 21, 19, 18][i - 16]);
+const IND = [
+  { k:"레미콘 출하 이행률", u:"%", s:REM_W, lv:v => v < 60 ? 2 : v < 90 ? 1 : 0, f:v => Math.round(v), cs:"A", lead:"근본 원인 신호" },
+  { k:"주간 SPI", u:"", s:SPI, lv:v => v < .6 ? 2 : v < .9 ? 1 : 0, f:v => v.toFixed(2), cs:"A" },
+  { k:"크레인 가동률", u:"%", s:CR_W.map(v => v * 100), lv:v => v < 30 ? 2 : v < 45 ? 1 : 0, f:v => Math.round(v), cs:"G" },
+  { k:"주간 원가 초과", u:"억", s:OVR_W, lv:v => v > 1 ? 2 : v > .3 ? 1 : 0, f:v => v.toFixed(1), cs:"B" },
+  { k:"설계변경 시공 선행", u:"건", s:CHGPRE_W, lv:v => v >= 2 ? 2 : v >= 1 ? 1 : 0, f:v => v, cs:"E" },
+  { k:"철근 로스율", u:"%", s:RBL_W, lv:v => v > 12 ? 2 : v > 5 ? 1 : 0, f:v => v.toFixed(1), cs:"B" },
+  { k:"검측 1회 합격률", u:"%", s:Q_PASS, lv:v => v < 75 ? 2 : v < 88 ? 1 : 0, f:v => v, cs:"D" },
+  { k:"신규 인력 비율", u:"%", s:NEW_R.map(v => v * 100), lv:v => v > 30 ? 2 : v > 20 ? 1 : 0, f:v => Math.round(v), cs:"C" },
+  { k:"토요일 작업 비중", u:"%", s:SAT_W, lv:v => v > 18 ? 2 : v > 12 ? 1 : 0, f:v => v, cs:"H" },
+  { k:"1천 인일당 사건", u:"건", s:RATE, lv:v => v > BASE_RATE * 1.8 ? 2 : v > BASE_RATE * 1.3 ? 1 : 0, f:v => v.toFixed(1), cs:"C" },
+  { k:"주간 민원", u:"건", s:H_W, lv:v => v >= 5 ? 2 : v >= 3 ? 1 : 0, f:v => v, cs:"H" },
+  { k:"기성 승인 지연", u:"일", s:BIL_W, lv:v => v > 14 ? 2 : v > 7 ? 1 : 0, f:v => v, cs:"I" }
+];
+IND.forEach(d => { d.first = (() => { for (let i = 0; i < NOW_W; i++) if (d.lv(d.s[i]) > 0) return i + 1; return null; })(); });
+const CASE_ON = { A:ON_A, B:ON_B, C:ON_C, D:ON_D, E:Math.min(...CHG_PRE.map(c => c.w)), G:14, H:firstWeek(i => H_W[i] >= 5), I:17 };
+const CASE_KEY = { A:"schedule", B:"cost", C:"safety", D:"quality", E:"change", F:"vendor", G:"equip", H:"noise", I:"cash" };
+const LV_C = [C.green, C.amber, C.red], LV_T = ["정상", "주의", "경보"];
+function spark(svg, d, x, y, w, h, upto){
+  const s = d.s.slice(0, upto), mx = Math.max(...d.s), mn = Math.min(...d.s), r = mx - mn || 1;
+  const p = s.map((v, i) => [x + i / (NOW_W - 1) * w, y + h - (v - mn) / r * h]);
+  el("path", { d:pts(p), fill:"none", stroke:C.muted, "stroke-width":1.5 }, svg);
+  p.forEach((q, i) => { const lv = d.lv(s[i]); if (lv) el("circle", { cx:q[0], cy:q[1], r:2.2, fill:LV_C[lv] }, svg); });
+  const last = p[p.length - 1]; el("circle", { cx:last[0], cy:last[1], r:3.5, fill:LV_C[d.lv(s[s.length - 1])] }, svg);
+}
+function watchTiles(upto, compact){
+  return IND.map((d, i) => {
+    const v = d.s[upto - 1], lv = d.lv(v);
+    return `<div class="wt lv${lv}"><div class="wt-top"><span class="wt-light"></span><span class="wt-k">${d.k}</span><span class="wt-cs">${d.cs}</span></div>
+      <div class="wt-v">${d.f(v)}<small>${d.u}</small></div>
+      ${compact ? "" : `<svg class="wt-sp" viewBox="0 0 200 40" id="sp${i}" aria-hidden="true"></svg><div class="wt-f">${d.first ? `첫 이상 신호 W${d.first}` : "이상 신호 없음"}${d.lead ? ` · ${d.lead}` : ""}</div>`}</div>`;
+  }).join("");
+}
+function wRoom(){
+  const lvls = IND.map(d => d.lv(d.s[NOW_W - 1]));
+  const nR = lvls.filter(x => x === 2).length, nA = lvls.filter(x => x === 1).length;
+  body.innerHTML = `
+    <div class="watch-head">
+      <div class="wh-sum"><span class="wh-n r">${nR}</span><span>경보</span><span class="wh-n a">${nA}</span><span>주의</span><span class="wh-n g">${IND.length - nR - nA}</span><span>정상</span></div>
+      <span class="eyebrow">W${NOW_W} 기준 · 선행 지표 ${IND.length}개 · 오른쪽 위 글자는 연결된 사건</span>
+    </div>
+    <div class="watch-grid">${watchTiles(NOW_W)}</div>
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head"><span class="eyebrow">다음에 터질 사건 · 분석관 예측</span></div>
+      <div class="pred">
+        <div class="pr lv2"><b>W24–W26</b><span>사건 C 재발 위험</span><p>6F 골조와 철골 착수가 겹치고, 만회안을 켜면 신규 인력이 다시 30%로 오릅니다.</p></div>
+        <div class="pr lv2"><b>W22–W27</b><span>사건 I 자금 계곡 심화</span><p>10월 기성 보류 ${HOLD_AMT.toFixed(1)}억이 풀리지 않으면 계곡이 ${eok(CF0.min, true)}까지 깊어집니다.</p></div>
+        <div class="pr lv1"><b>W23~</b><span>사건 D 확대 가능</span><p>B사 28일 강도 결과 2회분이 대기 중입니다. 3F-B 판정에 따라 보수 범위가 바뀝니다.</p></div>
+      </div>
+    </div>`;
+  IND.forEach((d, i) => spark($("sp" + i), d, 4, 4, 192, 32, NOW_W));
+  return null;
+}
+function wReplay(){
+  const cases = ["A","B","C","D","E","G","H","I"];
+  body.innerHTML = `
+    <div class="replay">
+      <div class="rp-ctl">
+        <button type="button" class="btn primary" id="rpPlay">▶ 재생</button>
+        <input type="range" class="rng" id="rpW" min="10" max="${NOW_W}" step="1" value="12" aria-label="되감기 주차">
+        <div class="rp-w"><b id="rpWk">W12</b><small id="rpDt"></small></div>
+      </div>
+      <div class="rp-cases" id="rpCases"></div>
+      <div class="rp-msg" id="rpMsg"></div>
+    </div>
+    <div class="watch-grid compact" id="rpTiles"></div>`;
+  let t = null;
+  const show = w => {
+    $("rpWk").textContent = "W" + w;
+    $("rpDt").textContent = `${md(weekStart(w))}–${md(weekEnd(w))}`;
+    $("rpTiles").innerHTML = watchTiles(w, true);
+    $("rpCases").innerHTML = cases.map(c => { const on = CASE_ON[c] && CASE_ON[c] <= w, now = CASE_ON[c] === w; return `<button type="button" class="rc${on ? " on" : ""}${now ? " now" : ""}" data-case="${CASE_KEY[c]}"><span>${c}</span>${CASES[CASE_KEY[c]].n}<small>${CASE_ON[c] ? "W" + CASE_ON[c] : ""}</small></button>`; }).join("");
+    const reds = IND.filter(d => d.lv(d.s[w - 1]) === 2).map(d => d.k);
+    const erupt = cases.filter(c => CASE_ON[c] === w);
+    let msg;
+    if (w < 14) msg = `모든 지표가 정상 범위입니다. 이 주에는 아무 일도 없어 보입니다.`;
+    else if (w === 14) msg = `<b style="color:var(--red)">레미콘 출하 이행률 경보.</b> 근본 원인 신호가 처음 켜졌습니다. 이 순간 대응했다면 품질은 2주, 안전은 3주의 여유가 있었습니다.`;
+    else msg = `경보 ${reds.length}개${erupt.length ? ` · 이번 주 새로 터진 사건 <b style="color:var(--red)">${erupt.join(", ")}</b>` : ""}${reds.length ? ` · ${reds.slice(0, 3).join(", ")}${reds.length > 3 ? " 외" : ""}` : ""}`;
+    $("rpMsg").innerHTML = msg;
+  };
+  $("rpW").addEventListener("input", e => { stop(); show(+e.target.value); });
+  const stop = () => { clearInterval(t); t = null; $("rpPlay").textContent = "▶ 재생"; };
+  $("rpPlay").addEventListener("click", () => {
+    if (t) { stop(); return; }
+    if (+$("rpW").value >= NOW_W) $("rpW").value = 10;
+    $("rpPlay").textContent = "❚❚ 정지";
+    t = setInterval(() => { const w = +$("rpW").value + 1; if (w > NOW_W) { stop(); return; } $("rpW").value = w; show(w); }, 900);
+  });
+  $("rpCases").addEventListener("click", e => { const b = e.target.closest(".rc"); if (!b || !b.classList.contains("on")) return; stop(); try { history.replaceState(null, "", "#" + b.dataset.case); } catch (x) {} setCase(b.dataset.case); });
+  show(12);
+  return () => clearInterval(t);
+}
+const SCENES_W = [
+  { label:"관제실", title:"조기 경보 관제실", meta:`선행 지표 ${IND.length}개 · W${NOW_W} 기준`, scan:"선행 지표 수집 중", render:wRoom,
+    say:`소장님, 여기는 앞으로 매주 보실 화면이에요. 지난 사건들에서 뽑은 [[선행 지표 ${IND.length}개]]를 신호등으로 띄웠어요. 아래에는 다음에 터질 사건을 예측해 뒀어요. 가장 급한 건 [[W24–W26 안전]]이에요.`,
+    log:`선행 지표 ${IND.length}개 관제 · 다음 위험 W24–W26` },
+  { label:"되감기", title:"되감기 · 그때 알았더라면", meta:`W10–W${NOW_W} 리플레이`, scan:"과거 신호 재생 중", render:wReplay,
+    say:`재생 버튼을 눌러 보세요. 12주차부터 한 주씩 되감아 보여드려요. [[14주차에 레미콘 출하 경보]]가 켜지는 순간이 보일 거예요. 이 화면이 그때 있었다면 품질과 안전 사건은 [[막을 시간]]이 있었어요.`,
+    log:`리플레이 · W14 첫 경보 → 사건 발현까지 0–3주` }
+];
+
+/* ======================== TOOL : SUSPECTS ======================== */
+const DOSSIERS = [
+  { id:"B레미콘", type:"업체", alias:"긴급 대체 레미콘 공급사", lvl:4, cases:["D","F","I"], ev:[["D",`28일 강도 연속 3회 평균 ${AVG_B.toFixed(1)}MPa · 설계 ${FCK}MPa 미달`],["D","3F-A 타설분 24.9MPa · 최저치"],["F",`협력업체 리스크 ${VRISK[1].toFixed(0)} · 3위`],["I",`강도 판정 보류로 10월 기성 ${HOLD_R[1].v.toFixed(1)}억 보류`]], verdict:"검증 없이 투입된 공급처. 3F 품질 하자와 기성 보류의 직접 원인입니다." },
+  { id:"을 형틀", type:"업체", alias:"대체 형틀팀", lvl:5, cases:["C","D","F","E"], ev:[["C",`재해 ${N_SR}건 모두 이 팀 · 근속 7일 이내`],["C",`신규 인력 비율 최고 ${Math.round(Math.max(...NEW_R) * 100)}%`],["D","3F-A 타설 1주차 · 콜드조인트 구간 시공"],["F","안전 35점 · 리스크 1위"]], verdict:"이번 현장에서 가장 많은 사건에 이름이 오른 용의자입니다." },
+  { id:"D 현장가공", type:"업체", alias:"철근 대체 가공 업체", lvl:4, cases:["B","D","F"], ev:[["B",`철근 로스율 ${LOSS_ACT.toFixed(1)}% (계획 3%) · 수량 차이 ${QV_RB.toFixed(1)}억`],["D",`피복 부족 ${Math.round(COVER_SHARE * 100)}%가 이 업체 가공 기간`],["F","원가 42점 · 품질 45점"]], verdict:"철근을 현장에서 잃고, 피복을 지키지 못했습니다." },
+  { id:"A레미콘", type:"업체", alias:"기존 레미콘 공급사", lvl:3, cases:["A","G","F"], ev:[["A",`공장 설비 고장 · 출하 중단 13일 · SPI ${SPI[14].toFixed(2)}`],["G","크레인 레미콘 대기 96시간"],["F","품질 92점 · 공정 38점"]], verdict:"근본 원인 제공자. 다만 품질은 우수해 공급처 이중화의 기준 업체입니다." },
+  { id:"토요일 15–18시", type:"시간대", alias:"만회 작업 시간대", lvl:5, cases:["C","H"], ev:[["C",`사건 위험도 ${HOT_RR.toFixed(1)}배 · 재해 2건`],["H",`토요일 민원 ${H_SAT}건`],["H",`10.17 최대 소음 ${H_PEAK.toFixed(1)}dB`]], verdict:"한 시간대가 사고와 민원을 동시에 만들었습니다." },
+  { id:"슬래브 단부 · 개구부", type:"구역", alias:"Z1 구역", lvl:4, cases:["C"], ev:[["C",`전체 사건의 ${Math.round(Z1_SHARE * 100)}%`],["C",`재해 ${ZSR[0]}건 · 개구부 추락 · 단부 헛디딤`]], verdict:"안전난간이 타설 속도를 따라가지 못한 구역입니다." },
+  { id:"3F-A 구역", type:"구역", alias:"레미콘 재개 첫날 타설 구획", lvl:4, cases:["D","I"], ev:[["D",`결함 ${Q3.A}건 · X3열 콜드조인트 ${Q3.J}건`],["D","B사 첫 출하분 · 강도 최저"],["I","품질 부적합 미조치로 기성 보류"]], verdict:"여러 용의자가 한날한시에 모인 현장입니다." },
+  { id:"만회 압박", type:"상황", alias:"공기를 되찾으려는 강행군", lvl:5, cases:["A","C","E","H"], ev:[["A",`현 추세 준공 +${BASE.delay}일`],["C","신규 인력 유입 · 토요일 작업"],["E",`시공 선행 ${CHG_PRE_LATE}건이 W15 이후`],["H","토요일 민원 급증"]], verdict:"선의의 압박이 다른 사건 네 개를 낳았습니다. 만회는 패키지로만 해야 합니다." },
+  { id:"자재 반입 시간", type:"프로세스", alias:"공급사 시계에 맞춘 운영", lvl:3, cases:["G"], ev:[["G",`자재 미도착 대기 ${G_LOST[0].h}시간`],["G","10.14 첫 철근 차량 10:20 · 계획 07:30"]], verdict:"크레인이 공급사를 기다렸습니다. 예약제로 뒤집어야 합니다." }
+];
+function sFiles(){
+  const types = ["전체", ...new Set(DOSSIERS.map(d => d.type))];
+  body.innerHTML = `
+    <div class="dossier-wrap">
+      <div class="panel dl">
+        <input type="search" id="dq" class="dq" placeholder="용의자 이름 검색" aria-label="용의자 검색">
+        <div class="dchips" id="dchips">${types.map((t, i) => `<button type="button" class="dchip${i ? "" : " on"}" data-t="${t}">${t}</button>`).join("")}</div>
+        <div class="dlist" id="dlist"></div>
+      </div>
+      <div class="folder" id="folder"></div>
+    </div>`;
+  let sel = 1, ft = "전체";
+  const list = () => {
+    const q = $("dq").value.trim();
+    const items = DOSSIERS.map((d, i) => ({ d, i })).filter(({ d }) => (ft === "전체" || d.type === ft) && (!q || d.id.includes(q) || d.alias.includes(q)));
+    $("dlist").innerHTML = items.length ? items.map(({ d, i }) => `<button type="button" class="ditem${i === sel ? " on" : ""}" data-i="${i}"><span class="dt">${d.type}</span><b>${d.id}</b><span class="dl5">${"■".repeat(d.lvl)}<em>${"■".repeat(5 - d.lvl)}</em></span></button>`).join("") : `<p class="board-note">검색 결과가 없습니다.</p>`;
+  };
+  const open = i => {
+    sel = i; const d = DOSSIERS[i];
+    $("folder").innerHTML = `
+      <div class="f-tab">FILE · ${String(i + 1).padStart(3, "0")}</div>
+      <div class="f-body">
+        <div class="f-head">
+          <div class="mug"><div class="mug-scale"></div><span>${d.id.replace(/\s/g, "").slice(0, 2)}</span><div class="mug-plate">${d.type} · No.${String(i + 1).padStart(3, "0")}</div></div>
+          <div class="f-id">
+            <span class="eyebrow">${d.type} · 위험도 ${d.lvl}/5</span>
+            <h3>${d.id}</h3>
+            <p>${d.alias}</p>
+            <div class="f-cases">${d.cases.map(c => `<button type="button" class="jump" data-case="${CASE_KEY[c]}">사건 ${c} · ${CASES[CASE_KEY[c]].n} →</button>`).join("")}</div>
+          </div>
+          <div class="stamp">${d.lvl >= 5 ? "주요 용의자" : d.lvl >= 4 ? "용의자" : "참고인"}</div>
+        </div>
+        <table class="f-ev"><thead><tr><th>사건</th><th>증거</th></tr></thead><tbody>${d.ev.map(([c, t]) => `<tr><td><span class="mk-s">${c}</span></td><td>${t}</td></tr>`).join("")}</tbody></table>
+        <div class="f-verdict"><span class="eyebrow">분석관 소견</span><p>${d.verdict}</p></div>
+      </div>`;
+    $("folder").querySelectorAll(".jump").forEach(b => b.addEventListener("click", () => { try { history.replaceState(null, "", "#" + b.dataset.case); } catch (e) {} setCase(b.dataset.case); }));
+    list();
+  };
+  $("dq").addEventListener("input", list);
+  $("dchips").addEventListener("click", e => { const b = e.target.closest(".dchip"); if (!b) return; ft = b.dataset.t; body.querySelectorAll(".dchip").forEach(x => x.classList.toggle("on", x === b)); list(); });
+  $("dlist").addEventListener("click", e => { const b = e.target.closest(".ditem"); if (b) open(+b.dataset.i); });
+  open(1);
+  return null;
+}
+const SCENES_S = [
+  { label:"용의자 파일", title:"용의자 파일", meta:`용의자 ${DOSSIERS.length}건 · 업체 · 구역 · 시간대 · 상황`, scan:"용의자 파일 열람 중", render:sFiles,
+    say:`모든 사건의 용의자를 파일로 묶었어요. 업체뿐 아니라 [[시간대, 구역, 상황]]도 용의자예요. 가장 두꺼운 파일은 [[을 형틀]]과 [[만회 압박]]이에요. 파일 안의 버튼을 누르면 해당 사건으로 바로 가요.`,
+    log:`용의자 ${DOSSIERS.length}건 파일화 · 최다 연루: 을 형틀 · 만회 압박` }
+];
+
+/* ======================== TOOL : TIMELINE (SUBWAY MAP) ======================== */
+const LINES = [
+  { l:"A", c:C.blue }, { l:"B", c:C.violet }, { l:"C", c:C.red }, { l:"D", c:C.amber }, { l:"E", c:C.teal },
+  { l:"F", c:"#8a5a00" }, { l:"G", c:"#3f7d20" }, { l:"H", c:"#c2410c" }, { l:"I", c:"#334155" }
+];
+const D = (m, d) => new Date(2026, m - 1, d);
+const firstPre = CHG_PRE.slice().sort((a, b) => a.exec - b.exec)[0];
+const STATIONS = [
+  { l:"A", d:weekStart(14), t:"SPI 이탈 시작", x:`W14 SPI ${SPI[13].toFixed(2)}` }, { l:"A", d:D(10, 8), t:"레미콘 출하 재개", x:"13일 만에 재개" }, { l:"A", d:BASE_DATE, t:`지연 ${DELAY}일 집계`, x:`현 추세 준공 +${BASE.delay}일` },
+  { l:"B", d:weekStart(15), t:"주간 초과 2.6억", x:"공기 연동 원가 급증" }, { l:"B", d:weekStart(18), t:"철근 로스 24.8%", x:"대체 업체 현장가공" }, { l:"B", d:BASE_DATE, t:`CPI ${CPI.toFixed(2)}`, x:`준공 손익 ${eok(PROFIT_BASE, true)}` },
+  { l:"C", d:weekStart(18), t:`신규 인력 ${Math.round(Math.max(...NEW_R) * 100)}%`, x:"대체 형틀팀 투입" }, ...SERIOUS.map((s2, k) => ({ l:"C", d:addDays(weekStart(s2.w), s2.day), t:`재해 ${k + 1}`, x:s2.desc })),
+  { l:"D", d:D(10, 9), t:"3F-A 타설", x:"레미콘 B사 첫 출하" }, { l:"D", d:D(10, 20), t:"3F-B 타설", x:"X3열 콜드조인트" }, { l:"D", d:D(11, 6), t:"강도 판정 미달", x:`3회 평균 ${AVG_B.toFixed(1)}MPa` },
+  { l:"E", d:firstPre.exec, t:"첫 시공 선행", x:`${firstPre.id} ${firstPre.trade}` }, { l:"E", d:BASE_DATE, t:`시공 선행 ${CHG_PRE.length}건`, x:`협의 ${CHG_NEG.toFixed(1)}억 · 불가 ${CHG_NO.toFixed(1)}억` },
+  { l:"F", d:D(10, 8), t:"B레미콘 투입", x:"검증 절차 없음" }, { l:"F", d:D(10, 12), t:"을 형틀 · D 현장가공 투입", x:"긴급 대체" },
+  { l:"G", d:D(9, 25), t:"크레인 레미콘 대기", x:"96시간 대기 시작" }, { l:"G", d:G_DAY, t:"10:20 첫 차량", x:`오전 ${G_MORNING_IDLE}분 대기` },
+  { l:"H", d:H_DAY, t:`최대 소음 ${H_PEAK.toFixed(1)}dB`, x:"토요일 펌프카 타설" }, { l:"H", d:weekStart(18), t:"주간 민원 7건", x:"토요일 민원 급증" },
+  { l:"I", d:D(10, 12), t:"9월 기성 승인 지연", x:"노무비 증빙 미비 +21일" }, { l:"I", d:D(11, 9), t:"9월 기성 입금", x:"35일 소요" }, { l:"I", d:D(11, 12), t:`10월 기성 37% 보류`, x:`${HOLD_AMT.toFixed(1)}억 · 품질 · 설계변경` }
+].map((st, i) => Object.assign({ id:i }, st));
+const ROOT_D = D(9, 25);
+function tMap(){
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">수사 일지 · 사건 노선도</span><span class="eyebrow" style="color:var(--dim)">역을 누르면 내용이 아래에 표시됩니다 · 가로로 스크롤</span></div>
+      <div class="subway-scroll"><svg id="tm" viewBox="0 0 1200 600" role="img" aria-label="사건별 노선도 형태의 수사 일지"></svg></div>
+    </div>
+    <div class="st-detail" id="stDetail"></div>`;
+  const svg = $("tm"), L = 130, Rr = 50, T = 80, lh = 54, W = 1200;
+  const t0 = D(8, 25).getTime(), t1 = D(11, 22).getTime();
+  const xs = d => L + (d.getTime() - t0) / (t1 - t0) * (W - L - Rr);
+  for (let d = new Date(t0); d.getTime() <= t1; d = addDays(d, 7)){ el("line", { x1:xs(d), x2:xs(d), y1:T - 30, y2:T + LINES.length * lh - 20, class:"gridl" }, svg); tx(svg, xs(d), T - 36, md(d), { class:"ax", "text-anchor":"middle" }); }
+  el("line", { x1:xs(BASE_DATE), x2:xs(BASE_DATE), y1:T - 44, y2:T + LINES.length * lh - 10, stroke:C.ink, "stroke-dasharray":"4 3" }, svg);
+  tx(svg, xs(BASE_DATE), T - 50, "기준일", { "text-anchor":"middle", "font-size":11, fill:C.ink, "font-weight":700, "font-family":KR });
+  // interchange
+  const rx = xs(ROOT_D);
+  el("rect", { x:rx - 16, y:T - 26, width:32, height:LINES.length * lh + 4, rx:16, fill:"#ffffff", stroke:C.ink, "stroke-width":3 }, svg);
+  LINES.forEach((ln, k) => {
+    const y = T + k * lh;
+    const path = el("path", { d:`M${L - 10} ${y} H${W - Rr}`, stroke:ln.c, "stroke-width":7, "stroke-linecap":"round", fill:"none" }, svg);
+    drawIn(path, k * 0.06);
+    el("rect", { x:8, y:y - 14, width:28, height:28, fill:ln.c }, svg);
+    tx(svg, 22, y + 5, ln.l, { "text-anchor":"middle", "font-size":14, fill:"#ffffff", "font-weight":700, "font-family":"Chakra Petch, sans-serif" });
+    tx(svg, 44, y + 5, CASES[CASE_KEY[ln.l]].n, { "font-size":12.5, fill:C.ink, "font-weight":600, "font-family":KR });
+    el("circle", { cx:rx, cy:y, r:9, fill:"#ffffff", stroke:C.ink, "stroke-width":3 }, svg);
+  });
+  tx(svg, rx, T + LINES.length * lh + 6, "환승역 · 레미콘 공장 설비 고장 (9.25)", { "text-anchor":"middle", "font-size":12.5, fill:C.red, "font-weight":700, "font-family":KR });
+  const g = el("g", null, svg);
+  const placed = {};
+  STATIONS.slice().sort((a, b) => a.d - b.d).forEach((st, i) => {
+    const k = LINES.findIndex(l => l.l === st.l), y = T + k * lh, x = xs(st.d);
+    const wdt = st.t.length * 10.5 + 8, x0 = x - wdt / 2, x1 = x + wdt / 2;
+    const P = placed[st.l] = placed[st.l] || { up:[], dn:[] };
+    const free = arr => !arr.some(([a, b]) => x0 < b && x1 > a);
+    let side = free(P.up) ? "up" : free(P.dn) ? "dn" : (P.up.length <= P.dn.length ? "up" : "dn");
+    const shift = free(P[side]) ? 0 : 13;
+    P[side].push([x0, x1]);
+    const ly = side === "up" ? y - 15 - shift : y + 24 + shift;
+    const n = fadeIn(el("g", { class:"stn", "data-id":st.id, tabindex:0, role:"button", "aria-label":`${st.l} ${st.t}` }, g), 0.5 + i * 0.03);
+    el("circle", { cx:x, cy:y, r:8, fill:"#ffffff", stroke:LINES[k].c, "stroke-width":3.5 }, n);
+    tx(n, Math.min(W - 6 - wdt / 2, x), ly, st.t, { "text-anchor":"middle", "font-size":11.5, fill:C.ink, "font-weight":600, "font-family":KR });
+  });
+  const detail = id => {
+    const st = STATIONS[id], ln = LINES.find(l => l.l === st.l);
+    $("stDetail").innerHTML = `<span class="st-badge" style="background:${ln.c}">${st.l}</span><div><span class="eyebrow">${ymd(st.d)} (${DOW[st.d.getDay()]}) · ${CASES[CASE_KEY[st.l]].n}</span><b>${st.t}</b><p>${st.x}</p></div><button type="button" class="jump" data-case="${CASE_KEY[st.l]}">사건 ${st.l} 열기 →</button>`;
+    $("stDetail").querySelector(".jump").addEventListener("click", e => { try { history.replaceState(null, "", "#" + e.target.dataset.case); } catch (x) {} setCase(e.target.dataset.case); });
+    svg.querySelectorAll(".stn").forEach(s2 => s2.classList.toggle("on", +s2.dataset.id === id));
+  };
+  svg.addEventListener("click", e => { const n = e.target.closest(".stn"); if (n) detail(+n.dataset.id); });
+  svg.addEventListener("keydown", e => { const n = e.target.closest(".stn"); if (n && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); detail(+n.dataset.id); } });
+  detail(STATIONS.findIndex(s2 => s2.l === "D" && s2.t === "3F-A 타설"));
+  return null;
+}
+const SCENES_T = [
+  { label:"사건 노선도", title:"수사 일지 · 사건 노선도", meta:`노선 ${LINES.length}개 · 역 ${STATIONS.length}개`, scan:"사건 기록 연대기 정리 중", render:tMap,
+    say:`모든 사건을 지하철 노선도처럼 그려 봤어요. 노선 아홉 개가 전부 [[9월 25일 환승역]]을 지나가요. 레미콘 공장 설비 고장이요. 역을 누르시면 그날 무슨 일이 있었는지, 어느 사건으로 이어지는지 보여드려요.`,
+    log:`노선 ${LINES.length}개 · 역 ${STATIONS.length}개 · 환승역 9.25` }
+];
+
+/* ======================== TOOL : LESSONS ======================== */
+const LESSONS = [
+  { ph:"착공 전", t:"핵심 자재 공급사 이중화", d:"레미콘은 2개사를 사전 승인해 두고, 한쪽이 멈추면 바로 전환합니다.", src:["A","D","F"], m:PEN_A + 1.4, o:"" },
+  { ph:"착공 전", t:"긴급 대체 업체 검증 체크리스트", d:"시험 타설, 이력 조회, 첫 출하분 강도 확인을 통과해야 투입합니다.", src:["D","F"], m:Q_ITEMS.core.later + Q_ITEMS.cover.later, o:"" },
+  { ph:"착공 전", t:"크레인 반입 슬롯 예약제", d:"자재 차량은 크레인 계획 시간에 맞춰 예약된 슬롯으로만 반입합니다.", src:["G"], m:G_LOST[0].h / 10 * CRANE_DAY / 10000, o:"" },
+  { ph:"골조 공사 중", t:"단부 · 개구부 방호를 타설 허가 조건으로", d:"안전난간과 개구부 덮개가 없으면 다음 층 타설 허가를 내주지 않습니다.", src:["C"], m:0, o:`재해 ${ZSR[0]}건` },
+  { ph:"골조 공사 중", t:"신규 투입자 버디제 · 교육 2시간 고정", d:"근속 7일 이내 인원은 숙련공과 짝을 지어 일합니다.", src:["C","F"], m:0, o:`사건 ${Math.round(FRESH_SHARE * 100)}% · 재해 ${FRESH_SR}건` },
+  { ph:"골조 공사 중", t:"철근 공장가공 원칙", d:"현장가공은 승인제로만 허용하고 로스율을 주간 보고합니다.", src:["B","D"], m:RB_VAR, o:`피복 부족 ${COVER_FIELD}건` },
+  { ph:"골조 공사 중", t:"타설 이음부 사전 계획 · 사진 검측", d:"끊길 수 있는 타설은 이음부 위치를 미리 정하고 사진으로 검측합니다.", src:["D"], m:Q_ITEMS.crack.later, o:`콜드조인트 ${Q3.J}건` },
+  { ph:"공기 만회 시", t:"만회안은 안전 대책과 패키지로만 승인", d:"작업조를 늘리면 버디제와 단부 방호를 함께 켭니다.", src:["A","C"], m:0, o:"사고 위험 +35% 방지" },
+  { ph:"공기 만회 시", t:"서면 지시 없이 변경 시공 금지", d:"구두 지시는 당일 서면 확인서로 바꾼 뒤에만 시공합니다.", src:["E"], m:CHG_NO + CHG_NEG * 0.55, o:`시공 선행 ${CHG_PRE.length}건` },
+  { ph:"공기 만회 시", t:"토요일 오후 고소 · 소음 작업 제한", d:"토요일 15시 이후에는 지상 정리 작업만 합니다.", src:["C","H"], m:0, o:`토요일 민원 ${H_SAT}건 · 재해 2건` },
+  { ph:"상시", t:"선행 지표 12개 주간 점검", d:"조기 경보 화면을 주간 공정회의 첫 순서로 봅니다.", src:["A","B","C","D"], m:0, o:"골든타임 최대 3주 확보" },
+  { ph:"상시", t:"기성 서류 주간 사전 취합", d:"노무비 · 자재 증빙을 매주 모아 월말 청구 지연을 없앱니다.", src:["I"], m:(CF0.cost), o:"9월 기성 21일 지연" }
+];
+const LS_KEY = "sfl-lessons-v1";
+function lNotes(){
+  let checked = [];
+  try { checked = JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch (e) { checked = []; }
+  const phases = [...new Set(LESSONS.map(l => l.ph))];
+  const totalM = LESSONS.reduce((s2, l) => s2 + l.m, 0);
+  body.innerHTML = `
+    <div class="lessons">
+      <div class="panel l-side">
+        <span class="eyebrow">다음 현장 준비도</span>
+        <svg id="lring" viewBox="0 0 220 220" class="l-ring" role="img" aria-label="교훈 체크리스트 완료율"></svg>
+        <div class="ledger"><div>체크한 교훈</div><div id="lN">—</div><div>막을 수 있었던 손실</div><div id="lM">—</div><div>그 밖의 피해</div><div id="lO" style="text-align:right;font-family:var(--f-body);font-size:12px">—</div></div>
+        <p class="board-note">체크 상태는 이 브라우저에만 저장됩니다. 다음 현장 착공 회의에서 하나씩 체크해 보세요.</p>
+      </div>
+      <div class="l-cols">${phases.map(ph => `<div class="l-col"><div class="l-ph">${ph}</div>${LESSONS.map((l, i) => l.ph !== ph ? "" : `
+        <label class="lcard" for="ls${i}"><input type="checkbox" id="ls${i}" data-i="${i}"${checked.includes(i) ? " checked" : ""}><span class="lbox"></span>
+          <span class="lc"><b>${l.t}</b><small>${l.d}</small><span class="lsrc">${l.src.map(c => `<i>${c}</i>`).join("")}<em>${l.m > 0.005 ? eok(l.m) : ""}${l.m > 0.005 && l.o ? " · " : ""}${l.o}</em></span></span></label>`).join("")}</div>`).join("")}</div>
+    </div>`;
+  const ring = $("lring");
+  function update(){
+    const on = LESSONS.map((_, i) => i).filter(i => $("ls" + i).checked);
+    try { localStorage.setItem(LS_KEY, JSON.stringify(on)); } catch (e) {}
+    const f = on.length / LESSONS.length, m = on.reduce((s2, i) => s2 + LESSONS[i].m, 0);
+    while (ring.firstChild) ring.removeChild(ring.firstChild);
+    const r = 88, c = 2 * Math.PI * r;
+    el("circle", { cx:110, cy:110, r, fill:"none", stroke:"#e6ebf2", "stroke-width":18 }, ring);
+    el("circle", { cx:110, cy:110, r, fill:"none", stroke:f >= .8 ? C.green : f >= .4 ? C.amber : C.red, "stroke-width":18, "stroke-dasharray":`${c * f} ${c}`, transform:"rotate(-90 110 110)", "stroke-linecap":"butt", style:"transition:stroke-dasharray .4s" }, ring);
+    tx(ring, 110, 116, Math.round(f * 100) + "%", { "text-anchor":"middle", "font-size":40, "font-weight":700, fill:C.ink, "font-family":"Chakra Petch, sans-serif" });
+    tx(ring, 110, 140, `${on.length} / ${LESSONS.length}`, { "text-anchor":"middle", "font-size":13, fill:C.muted });
+    $("lN").textContent = `${on.length}개`;
+    $("lM").textContent = `${m.toFixed(1)}억 / ${totalM.toFixed(1)}억`;
+    $("lO").textContent = on.map(i => LESSONS[i].o).filter(Boolean).slice(0, 3).join(" · ") || "—";
+  }
+  body.querySelectorAll(".lcard input").forEach(i => i.addEventListener("change", update));
+  update();
+  return null;
+}
+const SCENES_L = [
+  { label:"교훈 노트", title:"다음 현장 교훈 노트", meta:`교훈 ${LESSONS.length}개 · 4단계`, scan:"교훈 정리 중", render:lNotes,
+    say:`수사의 마지막은 [[다음 현장]]이에요. 아홉 개 사건에서 교훈 ${LESSONS.length}개를 뽑아 착공 전부터 단계별로 정리했어요. 하나씩 체크하시면 [[막을 수 있었던 손실]]이 쌓여요. 이 노트가 다음 현장의 첫 번째 회의 자료예요.`,
+    log:`교훈 ${LESSONS.length}개 · 착공 전 · 골조 · 만회 · 상시` }
+];
+
 /* ======================== CONTROLLER ======================== */
 const CASES = {
-  schedule: { no:"SFL-26-1115-A", sub:"공정 지연 수사", scenes:SCENES },
-  cost:     { no:"SFL-26-1115-B", sub:"원가 초과 수사", scenes:SCENES_B },
-  safety:   { no:"SFL-26-1115-C", sub:"안전 사고 수사", scenes:SCENES_C },
-  quality:  { no:"SFL-26-1115-D", sub:"품질 하자 수사", scenes:SCENES_D },
-  board:    { no:"SFL-26-1115", sub:"사건 종합 보드", scenes:SCENES_BOARD }
+  schedule: { no:"SFL-26-1115-A", sub:"공정 지연 수사", scenes:SCENES,   g:"case", l:"A", n:"공정 지연" },
+  cost:     { no:"SFL-26-1115-B", sub:"원가 초과 수사", scenes:SCENES_B, g:"case", l:"B", n:"원가 초과" },
+  safety:   { no:"SFL-26-1115-C", sub:"안전 사고 수사", scenes:SCENES_C, g:"case", l:"C", n:"안전 사고" },
+  quality:  { no:"SFL-26-1115-D", sub:"품질 하자 수사", scenes:SCENES_D, g:"case", l:"D", n:"품질 하자" },
+  change:   { no:"SFL-26-1115-E", sub:"설계변경 수사", scenes:SCENES_E, g:"case", l:"E", n:"설계변경" },
+  vendor:   { no:"SFL-26-1115-F", sub:"협력업체 수사", scenes:SCENES_F, g:"case", l:"F", n:"협력업체" },
+  equip:    { no:"SFL-26-1115-G", sub:"장비 가동 수사", scenes:SCENES_G, g:"case", l:"G", n:"장비 가동" },
+  noise:    { no:"SFL-26-1115-H", sub:"민원 · 환경 수사", scenes:SCENES_H, g:"case", l:"H", n:"민원 환경" },
+  cash:     { no:"SFL-26-1115-I", sub:"현금흐름 수사", scenes:SCENES_I, g:"case", l:"I", n:"현금흐름" },
+  board:    { no:"SFL-26-1115", sub:"사건 종합 보드", scenes:SCENES_BOARD, g:"board", l:"★", n:"종합 보드" },
+  watch:    { no:"SFL-TOOL-W", sub:"조기 경보", scenes:SCENES_W, g:"tool", l:"W", n:"조기 경보" },
+  suspects: { no:"SFL-TOOL-S", sub:"용의자 파일", scenes:SCENES_S, g:"tool", l:"S", n:"용의자 파일" },
+  timeline: { no:"SFL-TOOL-T", sub:"수사 일지", scenes:SCENES_T, g:"tool", l:"T", n:"수사 일지" },
+  lessons:  { no:"SFL-TOOL-L", sub:"교훈 노트", scenes:SCENES_L, g:"tool", l:"L", n:"교훈 노트" }
 };
+(() => {
+  const groups = [["case","사건 파일"],["board","종합"],["tool","수사 도구"]];
+  $("rail").innerHTML = groups.filter(([g]) => Object.values(CASES).some(c => c.g === g)).map(([g, lab]) => `<div class="rail-group rg-${g}"><span class="rail-label">${lab}</span><div class="rail-tabs" role="tablist">${
+    Object.entries(CASES).filter(([, c]) => c.g === g).map(([id, c]) => `<button class="case-tab" type="button" role="tab" data-case="${id}" aria-selected="false"><span class="tl">${c.l}</span><span class="tn">${c.n}</span></button>`).join("")}</div></div>`).join("");
+})();
 let caseId = "schedule", SC = SCENES;
 let cur = -1, typing = null, autoTimer = null, auto = false, busy = false;
-const visitedBy = { schedule:new Set(), cost:new Set(), safety:new Set(), quality:new Set(), board:new Set() };
+const visitedBy = {}; Object.keys(CASES).forEach(k => { visitedBy[k] = new Set(); });
 const stepList = $("stepList");
 function buildSteps(){
   stepList.style.gridTemplateColumns = `repeat(${SC.length},minmax(0,1fr))`;
@@ -2389,7 +3850,7 @@ function render(i){
   $("sceneStep").textContent = `STEP ${String(i + 1).padStart(2, "0")} / ${String(SC.length).padStart(2, "0")}`;
   $("sceneTitle").textContent = s.title;
   $("sceneMark").textContent = i + 1;
-  $("wm").textContent = { schedule:"A", cost:"B", safety:"C", quality:"D", board:"" }[caseId];
+  $("wm").textContent = CASES[caseId].g === "board" ? "" : CASES[caseId].l;
   $("sceneMeta").textContent = s.meta;
   body.scrollTop = 0;
   cleanup = s.render() || null;
@@ -2423,6 +3884,7 @@ function setCase(id, initial){
   setAuto(false);
   caseId = id; SC = CASES[id].scenes;
   document.querySelectorAll(".case-tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.case === id)));
+  const at = document.querySelector(`.case-tab[data-case="${id}"]`); if (at && !initial) at.scrollIntoView({ block:"nearest", inline:"nearest" });
   $("caseNo").textContent = CASES[id].no;
   $("brandSub").textContent = "현장 포렌식 랩 · " + CASES[id].sub;
   buildSteps();
