@@ -299,6 +299,66 @@ svg text{font-family:var(--f-mono)}
 .step.done .n::before{content:"";display:inline-block;width:9px;height:8px;background:var(--tape);clip-path:polygon(18% 0,82% 0,100% 100%,0 100%);margin-right:6px;vertical-align:0}
 @media (max-width:640px){ .watermark{font-size:150px;bottom:-26px} .scene-mark{width:44px;height:38px;font-size:20px} }
 
+
+/* ---------- evidence board ---------- */
+.board-scroll{overflow-x:auto;overflow-y:hidden;margin:-4px -4px 0;padding:4px}
+.board{position:relative;width:100%;min-width:900px;aspect-ratio:1000/600;background:
+  radial-gradient(circle at 1px 1px, rgba(15,29,51,.10) 1px, transparent 1.5px) 0 0/18px 18px, #fbfcfe;border:1px solid var(--line)}
+.strings{position:absolute;inset:0;width:100%;height:100%}
+.strings .str{transition:stroke-width .2s,opacity .2s}
+.board.focusing .strings .str{opacity:.15}
+.board.focusing .strings .str.on{opacity:1;stroke-width:3.4}
+.bnode{position:absolute;transform:translate(-50%,-50%);width:180px;background:#ffffff;border:1px solid var(--line-2);padding:14px 14px 12px;display:flex;flex-direction:column;gap:2px;text-align:left;box-shadow:0 10px 24px rgba(15,29,51,.10),0 1px 0 rgba(15,29,51,.05);transition:opacity .2s,transform .2s,box-shadow .2s;font:inherit;color:inherit;z-index:2}
+.bnode .pin{position:absolute;top:-7px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff7a8a,#b0202f);box-shadow:0 2px 3px rgba(0,0,0,.25)}
+.bnode .bt{font-family:var(--f-mono);font-size:10px;letter-spacing:.16em;color:var(--muted)}
+.bnode b{font-size:14px;font-weight:600;line-height:1.35}
+.bnode small{font-size:11.5px;color:var(--muted);line-height:1.4}
+.bnode .bk{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1.1;color:var(--red);font-variant-numeric:tabular-nums}
+.bnode.mech{width:160px;border-style:dashed;background:#fffdf3}
+.bnode.mech .pin{background:radial-gradient(circle at 35% 35%,#ffe27a,#c79a00)}
+.bnode.root{width:200px;background:var(--fg);color:#ffffff;border-color:var(--fg);transform:translate(-50%,-50%) rotate(-2deg)}
+.bnode.root .bt{color:var(--tape)}
+.bnode.root small{color:#c4cfdd}
+.bnode.root b{font-size:16px}
+.bnode.case{width:180px;cursor:pointer;border-top:4px solid var(--tape)}
+.bnode.case:nth-of-type(odd){transform:translate(-50%,-50%) rotate(1.2deg)}
+.bnode.case:hover,.bnode.case:focus-visible{box-shadow:0 16px 30px rgba(15,29,51,.16);transform:translate(-50%,-52%) rotate(0deg)}
+.bnode .go{margin-top:6px;font-size:12px;font-weight:600;color:var(--cyan)}
+.bnode.dim{opacity:.28}
+.elabels{position:absolute;inset:0;pointer-events:none;z-index:1}
+.elab{position:absolute;transform:translate(-50%,-50%);background:var(--tape);color:var(--fg);font-size:11px;font-weight:600;padding:2px 7px;white-space:nowrap;box-shadow:0 2px 4px rgba(15,29,51,.15);animation:fadeIn .4s ease backwards;transition:opacity .2s}
+.board.focusing .elab{opacity:.15}
+.board.focusing .elab.on{opacity:1}
+.board-note{margin:10px 2px 0;font-size:12.5px;color:var(--muted)}
+.bill{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px}
+.bill-total{display:flex;flex-direction:column;gap:14px}
+.bill-num{font-family:var(--f-display);font-weight:700;font-size:64px;line-height:1;color:var(--red);font-variant-numeric:tabular-nums}
+.bill-num small{font-size:20px;margin-left:6px;color:var(--muted);font-weight:500}
+.bill-bar{display:flex;height:16px;gap:2px}
+.bill-bar i{display:block}
+.bill-leg{display:flex;flex-direction:column;gap:8px}
+.bill-leg span{display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:center;font-size:13px}
+.bill-leg span i{width:12px;height:12px;display:block}
+.bill-leg b{font-family:var(--f-mono);font-weight:600}
+.bill-foot{margin:0;font-size:12.5px;color:var(--muted);border-top:1px dashed var(--line-2);padding-top:12px}
+.pkg{display:flex;flex-direction:column}
+.pkg-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.pkg-row b{display:block;font-size:14px;font-weight:600}
+.pkg-row small{display:block;font-size:12px;color:var(--muted)}
+.pkg-row .from{font-family:var(--f-mono);font-size:13px;color:var(--muted);text-decoration:line-through;text-decoration-color:var(--red);white-space:nowrap}
+.pkg-row .to{font-family:var(--f-display);font-weight:700;font-size:18px;white-space:nowrap;min-width:84px;text-align:right}
+.pkg-row .to.ok{color:var(--green)}
+.mk-s{display:grid;place-items:center;width:30px;height:26px;background:var(--tape);font-family:var(--f-display);font-weight:700;clip-path:polygon(18% 0,82% 0,100% 100%,0 100%);padding-top:3px}
+.claim{margin-top:14px;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line)}
+.claim-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.claim-tags span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;background:#ffffff;border:1px solid var(--line-2);padding:4px 10px 4px 4px}
+.claim-tags i{font-style:normal;font-family:var(--f-display);font-weight:700;background:var(--fg);color:#ffffff;width:20px;height:20px;display:grid;place-items:center;font-size:11px}
+.case-tab.board-tab{background:var(--fg);color:#ffffff}
+.case-tab.board-tab b{color:var(--tape)}
+.case-tab.board-tab[aria-selected="true"]{background:var(--fg);color:#ffffff;box-shadow:inset 0 -3px 0 var(--tape)}
+@media (max-width:980px){ .bill{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:640px){ .pkg-row{grid-template-columns:30px minmax(0,1fr) auto} .pkg-row .from{display:none} .bill-num{font-size:48px} }
+
 /* ---------- responsive ---------- */
 @media (max-width:1180px){
   .stage{grid-template-columns:minmax(0,1fr) 320px}
@@ -360,6 +420,7 @@ svg text{font-family:var(--f-mono)}
       <button class="case-tab" type="button" role="tab" data-case="cost" aria-selected="false"><b>CASE B</b>원가 초과</button>
       <button class="case-tab" type="button" role="tab" data-case="safety" aria-selected="false"><b>CASE C</b>안전 사고</button>
       <button class="case-tab" type="button" role="tab" data-case="quality" aria-selected="false"><b>CASE D</b>품질 하자</button>
+      <button class="case-tab board-tab" type="button" role="tab" data-case="board" aria-selected="false"><b>BOARD</b>종합 보드</button>
     </div>
     <div class="top-right">
       <span class="live"><i></i>LIVE ANALYSIS</span>
@@ -2082,18 +2143,205 @@ const SCENES_D = [
     log:`품질 리스크 ${Q_BASE.toFixed(2)}억 · 조기 조치 판단` }
 ];
 
+/* ======================== BOARD : CROSS-CASE ======================== */
+const BASE_A_SPI = SPI, BASE_RATE = avg(RATE.slice(0, 13)), BASE_Q = avg(Q_W.slice(0, 13));
+const firstWeek = f => { for (let i = 0; i < NOW_W; i++) if (f(i)) return i + 1; return null; };
+const ON_A = firstWeek(i => SPI[i] < 0.9);
+const ON_B = firstWeek(i => OVR_W[i] > 0.5);
+const ON_C = firstWeek(i => RATE[i] > BASE_RATE * 1.5 && i >= 13);
+const ON_D = firstWeek(i => Q_W[i] > BASE_Q * 1.5 && i >= 13);
+const ROOT_W = 14;
+const PKG = (() => {
+  const profit = PROFIT_BASE + MEASURES.recov.net + MEASURES.factory.net + MEASURES.es.net + CLAIM * 0.9;
+  const saf = safetySim({ recov:true, buddy:true, edge:true, sat:true, report:true });
+  const q = Object.values(Q_ITEMS).reduce((s, v) => s + v.now + v.after, 0);
+  return { profit, saf, q };
+})();
+const EXPOSURE = { cost:OVER, pen:PEN_A, qual:Q_BASE };
+const EXPOSURE_T = EXPOSURE.cost + EXPOSURE.pen + EXPOSURE.qual;
+
+function boardMap(){
+  const N = {
+    root: { x:115, y:300, kind:"root", t:"근본 원인", h:"레미콘 공장 설비 고장", s:`출하 중단 13일 · ${md(DAYS[11].d)}–${md(DAYS[23].d)}` },
+    m1:   { x:400, y:110, kind:"mech", t:"연쇄 1", h:"형틀팀 이탈 → 대체 팀 투입", s:"일감 중단으로 숙련공 이탈" },
+    m3:   { x:400, y:300, kind:"mech", t:"연쇄 2", h:"철근 현장가공 전환", s:"재개 물량을 맞추려는 긴급 조치" },
+    m2:   { x:400, y:490, kind:"mech", t:"연쇄 3", h:"레미콘 B사 긴급 투입", s:"검증되지 않은 공급처" },
+    m4:   { x:620, y:300, kind:"mech", t:"연쇄 4", h:"만회 압박 · 토요일 작업", s:"공기를 되찾으려는 강행군" },
+    A:    { x:620, y:95,  kind:"case", id:"schedule", t:"CASE A", h:"공정 지연", k:`${DELAY}일`, s:`최저 SPI ${Math.min(...SPI).toFixed(2)}` },
+    B:    { x:885, y:170, kind:"case", id:"cost", t:"CASE B", h:"원가 초과", k:`+${OVER.toFixed(1)}억`, s:`준공 손익 ${eok(PROFIT_BASE, true)}` },
+    C:    { x:885, y:440, kind:"case", id:"safety", t:"CASE C", h:"안전 사고", k:`재해 ${N_SR}건`, s:`숨은 아차사고 ${H_EXP_NM - N_NM}건` },
+    D:    { x:620, y:505, kind:"case", id:"quality", t:"CASE D", h:"품질 하자", k:`${Q_DENS_X.toFixed(1)}배`, s:"3F 결함 밀도" }
+  };
+  const E = [
+    ["root","A",`SPI ${Math.min(...SPI).toFixed(2)}`, .5, [300,250]], ["root","m1","일감 중단"], ["root","m3","물량 압박"], ["root","m2","공급처 교체"],
+    ["m1","C",`신규 인력 ${Math.round(Math.max(...NEW_R) * 100)}%`, .5, [760,130]], ["m1","A",""],
+    ["m3","B",`철근 로스 ${LOSS_ACT.toFixed(1)}%`], ["m3","D",`피복 부족 ${Math.round(COVER_SHARE * 100)}%`],
+    ["m2","D",`${AVG_B.toFixed(1)}MPa`, .34],
+    ["A","B",`1일 ${Math.round(DAILY_ALL).toLocaleString("ko-KR")}만`], ["A","m4","공기 만회"], ["m4","C",`토 15–18시 ${HOT_RR.toFixed(1)}배`, .42],
+    ["D","B",`품질 리스크 ${Q_BASE.toFixed(1)}억`, .7]
+  ];
+  body.innerHTML = `
+    <div class="board-scroll"><div class="board" id="board">
+      <svg class="strings" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true" id="strings"></svg>
+      ${Object.entries(N).map(([k, n]) => `
+        <${n.kind === "case" ? "button type=\"button\"" : "div"} class="bnode ${n.kind}" data-k="${k}" style="left:${n.x / 10}%;top:${n.y / 6}%"${n.kind === "case" ? ` data-case="${n.id}" aria-label="${n.t} ${n.h} 사건 열기"` : ""}>
+          <span class="pin"></span>
+          <span class="bt">${n.t}</span>
+          <b>${n.h}</b>
+          ${n.k ? `<span class="bk">${n.k}</span>` : ""}
+          <small>${n.s}</small>
+          ${n.kind === "case" ? `<span class="go">사건 열기 →</span>` : ""}
+        </${n.kind === "case" ? "button" : "div"}>`).join("")}
+      <div class="elabels" id="elabels"></div>
+    </div></div>
+    <p class="board-note">카드에 마우스를 올리면 연결된 실만 강조됩니다. 사건 카드를 누르면 해당 사건 브리핑으로 이동합니다.</p>`;
+  const svg = $("strings"), labs = $("elabels");
+  const paths = E.map(([a, b, lab, tt, ctrl], i) => {
+    const p = N[a], q = N[b];
+    const mx = ctrl ? ctrl[0] : (p.x + q.x) / 2, my = ctrl ? ctrl[1] : (p.y + q.y) / 2 + (Math.abs(p.y - q.y) < 30 ? 22 : 0) + (i % 2 ? 8 : -8);
+    const d = `M${p.x} ${p.y} Q${mx} ${my} ${q.x} ${q.y}`;
+    el("path", { d, fill:"none", stroke:"rgba(15,29,51,.12)", "stroke-width":4, transform:"translate(1.5,2.5)" }, svg);
+    const path = el("path", { d, fill:"none", stroke:"#d6334a", "stroke-width":2.2, "data-a":a, "data-b":b, class:"str" }, svg);
+    drawIn(path, 0.1 + i * 0.07);
+    const t0 = tt === undefined ? .5 : tt, u = 1 - t0;
+    const lx = u * u * p.x + 2 * u * t0 * mx + t0 * t0 * q.x, ly = u * u * p.y + 2 * u * t0 * my + t0 * t0 * q.y;
+    if (!lab) return path;
+    const t = document.createElement("span");
+    t.className = "elab"; t.dataset.a = a; t.dataset.b = b; t.textContent = lab;
+    t.style.left = lx / 10 + "%"; t.style.top = ly / 6 + "%";
+    if (!reduced) t.style.animationDelay = (0.6 + i * 0.07) + "s";
+    labs.appendChild(t);
+    return path;
+  });
+  const board = $("board");
+  const focus = k => {
+    board.classList.toggle("focusing", !!k);
+    paths.forEach(p => p.classList.toggle("on", !!k && (p.dataset.a === k || p.dataset.b === k)));
+    labs.querySelectorAll(".elab").forEach(l => l.classList.toggle("on", !!k && (l.dataset.a === k || l.dataset.b === k)));
+    board.querySelectorAll(".bnode").forEach(n => {
+      const linked = !k || n.dataset.k === k || E.some(([a, b]) => (a === k && b === n.dataset.k) || (b === k && a === n.dataset.k));
+      n.classList.toggle("dim", !linked);
+    });
+  };
+  board.querySelectorAll(".bnode").forEach(n => {
+    n.addEventListener("pointerenter", () => focus(n.dataset.k));
+    n.addEventListener("pointerleave", () => focus(null));
+    n.addEventListener("focus", () => focus(n.dataset.k));
+    n.addEventListener("blur", () => focus(null));
+    if (n.dataset.case) n.addEventListener("click", () => {
+      try { history.replaceState(null, "", "#" + n.dataset.case); } catch (e) {}
+      setCase(n.dataset.case);
+    });
+  });
+  return null;
+}
+
+function boardCascade(){
+  const rows = [
+    { lab:"근본 원인 · 레미콘 출하", c:"#0f1d33", v:i => (i >= 13 && i <= 15) ? 1 : 0, on:ROOT_W, txt:"출하 중단" },
+    { lab:"A · 공정 (SPI 하락)", c:"#0b72c4", v:i => Math.max(0, (1 - SPI[i]) / 0.88), on:ON_A, txt:"SPI < 0.90" },
+    { lab:"B · 원가 (주간 초과)", c:"#7a3fd1", v:i => Math.min(1, OVR_W[i] / 2.6), on:ON_B, txt:"초과 > 0.5억/주" },
+    { lab:"D · 품질 (부적합)", c:"#d97706", v:i => Math.min(1, Math.max(0, (Q_W[i] - BASE_Q) / (Math.max(...Q_W) - BASE_Q))), on:ON_D, txt:"평소의 1.5배" },
+    { lab:"C · 안전 (사건율)", c:"#d6334a", v:i => Math.min(1, Math.max(0, (RATE[i] - BASE_RATE) / (Math.max(...RATE) - BASE_RATE))), on:ON_C, txt:"평소의 1.5배" }
+  ];
+  const lagMax = Math.max(ON_A, ON_B, ON_C, ON_D) - ROOT_W;
+  body.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="eyebrow">연쇄 반응 타임라인 · W10–W${NOW_W}</span><span class="eyebrow" style="color:var(--dim)">칸이 진할수록 평소 대비 이상 신호가 강합니다</span></div>
+      <div class="chart-scroll"><svg id="b2" viewBox="0 0 1000 380" role="img" aria-label="네 사건의 이상 신호가 나타난 시점 비교"></svg></div>
+    </div>
+    <div class="ev-grid">
+      <div class="ev"><div class="top"><span class="eyebrow">원인 발생</span><span class="chip mute">W${ROOT_W}</span></div><div class="r">1번</div><p>${md(DAYS[11].d)} 레미콘 공장 설비 고장. 원인은 한 번 일어났습니다.</p></div>
+      <div class="ev"><div class="top"><span class="eyebrow">결과 발현</span><span class="chip warn">4개 사건</span></div><div class="r" style="color:var(--amber)">${lagMax}주에 걸쳐</div><p>공정 · 원가 W${ON_A} → 품질 W${ON_D} → 안전 W${ON_C} 순서로 터졌습니다.</p></div>
+      <div class="ev key"><div class="top"><span class="eyebrow">대응 골든타임</span><span class="chip crit">교훈</span></div><div class="r">최대 ${lagMax}주</div><p>원인을 잡은 날부터 품질 · 안전이 터지기 전까지가 막을 수 있는 시간이었습니다.</p></div>
+    </div>`;
+  const svg = $("b2"), W = 1000, L = 190, Rr = 20, T = 40, rh = 56, W0 = 10, nW = NOW_W - W0 + 1, cw = (W - L - Rr) / nW;
+  const xw = w => L + (w - W0) * cw;
+  rows.forEach((r, ri) => {
+    const y = T + ri * rh;
+    tx(svg, 8, y + rh / 2 + 5, r.lab, { "font-size":13, fill:"#0f1d33", "font-family":"IBM Plex Sans KR, sans-serif", "font-weight":600 });
+    for (let w = W0; w <= NOW_W; w++){
+      const v = r.v(w - 1);
+      const c = el("rect", { x:xw(w) + 2, y:y + 6, width:cw - 4, height:rh - 12, fill: v > 0.02 ? r.c : "#f3f6fa", "fill-opacity": v > 0.02 ? 0.12 + v * 0.8 : 1 }, svg);
+      if (!reduced){ c.style.opacity = 0; c.style.transition = `opacity .3s ease ${ri * 0.25 + (w - W0) * 0.03}s`; requestAnimationFrame(() => requestAnimationFrame(() => { c.style.opacity = 1; })); }
+    }
+    if (r.on){
+      const g = el("g", { class:"fade-in", style:`animation-delay:${0.4 + ri * 0.25}s` }, svg);
+      el("rect", { x:xw(r.on) + 1, y:y + 5, width:cw - 2, height:rh - 10, fill:"none", stroke:"#0f1d33", "stroke-width":2.5 }, g);
+      el("path", { d:`M${xw(r.on) + cw / 2 - 7} ${y + 1} h14 l-7 7z`, fill:"#f5c518", stroke:"#0f1d33", "stroke-width":1 }, g);
+    }
+  });
+  for (let w = W0; w <= NOW_W; w++) tx(svg, xw(w) + cw / 2, T + rows.length * rh + 18, "W" + w, { class:"ax", "text-anchor":"middle", "font-size":11.5, fill: w === ROOT_W ? "#d6334a" : undefined });
+  // cascade arrow
+  const pts2 = rows.map((r, ri) => [xw(r.on) + cw / 2, T + ri * rh + rh / 2]);
+  const arrow = el("path", { d:pts(pts2), fill:"none", stroke:"#0f1d33", "stroke-width":2, "stroke-dasharray":"5 4" }, svg);
+  drawIn(arrow, 1.4);
+  pts2.forEach(p => el("circle", { cx:p[0], cy:p[1], r:5, fill:"#f5c518", stroke:"#0f1d33", "stroke-width":1.5, class:"fade-in", style:"animation-delay:1.6s" }, svg));
+  tx(svg, xw(ROOT_W) + cw / 2, T - 14, "원인 발생", { "text-anchor":"middle", "font-size":12, fill:"#d6334a", "font-weight":700 });
+  const gx0 = xw(ROOT_W + 1), gx1 = xw(Math.max(ON_C, ON_D));
+  el("path", { d:`M${gx0} ${T - 22} H${gx1}`, stroke:"#d97706", "stroke-width":2 }, svg);
+  tx(svg, (gx0 + gx1) / 2 + 30, T - 28, "골든타임", { "text-anchor":"middle", "font-size":12, fill:"#d97706", "font-weight":700 });
+  return null;
+}
+
+function boardBill(){
+  const segs = [
+    { lab:"원가 초과 (기투입)", v:EXPOSURE.cost, c:"#7a3fd1" },
+    { lab:"지체상금 (현 추세)", v:EXPOSURE.pen, c:"#0b72c4" },
+    { lab:"품질 하자 리스크", v:EXPOSURE.qual, c:"#d97706" }
+  ];
+  body.innerHTML = `
+    <div class="bill">
+      <div class="panel bill-total">
+        <span class="eyebrow">근본 원인 하나가 남긴 청구서</span>
+        <div class="bill-num">${EXPOSURE_T.toFixed(1)}<small>억 원</small></div>
+        <div class="bill-bar">${segs.map(s => `<i style="flex:${s.v.toFixed(2)} 1 0;background:${s.c}" title="${s.lab}"></i>`).join("")}</div>
+        <div class="bill-leg">${segs.map(s => `<span><i style="background:${s.c}"></i>${s.lab}<b>${s.v.toFixed(1)}억</b></span>`).join("")}</div>
+        <p class="bill-foot">여기에 재해 ${N_SR}건, 숨은 아차사고 약 ${H_EXP_NM - N_NM}건이라는 금액으로 환산되지 않는 위험이 더해집니다.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="eyebrow">통합 대응 패키지 · 조치 전 → 조치 후</span></div>
+        <div class="pkg">
+          <div class="pkg-row"><span class="mk-s">A</span><div><b>공정</b><small>작업조 +${BEST_A.c}조${BEST_A.s ? " · 일요일 작업" : ""}${BEST_A.k ? " · 데크플레이트" : ""}</small></div><span class="from">+${BASE.delay}일 지연</span><span class="to ok">${BEST_A.r.delay <= 0 ? (BEST_A.r.delay === 0 ? "정시 준공" : `${-BEST_A.r.delay}일 조기`) : `+${BEST_A.r.delay}일`}</span></div>
+          <div class="pkg-row"><span class="mk-s">B</span><div><b>손익</b><small>만회안 · 철근 공장가공 · 물가변동 · 레미콘사 청구</small></div><span class="from">${eok(PROFIT_BASE, true)}</span><span class="to ${PKG.profit >= 0 ? "ok" : ""}">${eok(PKG.profit, true)}</span></div>
+          <div class="pkg-row"><span class="mk-s">C</span><div><b>안전 (8주 예상 사고)</b><small>만회안 + 버디제 · 단부 방호 · 토요일 제한 · 보고 포상</small></div><span class="from">${SBASE.total.toFixed(1)}건</span><span class="to ok">${PKG.saf.total.toFixed(1)}건</span></div>
+          <div class="pkg-row"><span class="mk-s">D</span><div><b>품질 리스크</b><small>코어 판정 · 균열 보수 · 피복 보강 · 사진 검측</small></div><span class="from">${Q_BASE.toFixed(2)}억</span><span class="to ok">${PKG.q.toFixed(2)}억</span></div>
+        </div>
+        <div class="claim">
+          <span class="eyebrow">레미콘사 청구 근거 증거 묶음</span>
+          <div class="claim-tags"><span><i>A</i>출하 중단 13일 · SPI ${SPI[14].toFixed(2)}</span><span><i>B</i>귀책 구간 원가 ${CLAIM.toFixed(1)}억</span><span><i>D</i>대체 공급 B사 강도 미달</span></div>
+        </div>
+      </div>
+    </div>`;
+  return null;
+}
+
+const SCENES_BOARD = [
+  { label:"증거 보드", title:"사건 종합 보드", meta:`사건 4개 · 연결 13개`, scan:"사건 간 연결 고리 추적 중", render:boardMap,
+    say:`소장님, 네 사건을 한 보드에 붙여 봤어요. 따로 보면 공정, 원가, 안전, 품질 네 가지 문제처럼 보이죠. 그런데 빨간 실을 따라가 보면 전부 [[한 점]]으로 모여요. ${md(DAYS[11].d)}, [[레미콘 공장 설비 고장]]이에요. 카드를 누르시면 그 사건으로 바로 들어가요.`,
+    log:"근본 원인 1개 → 사건 4개 연결" },
+  { label:"연쇄 타임라인", title:"연쇄 반응 타임라인", meta:`W10–W${NOW_W} · 이상 신호 발현 시점`, scan:"사건별 발현 시점 정렬 중", render:boardCascade,
+    say:`시간 순서로 펼치면 더 분명해요. 원인은 ${ROOT_W}주차에 한 번 일어났는데, 결과는 공정과 원가가 ${ON_A}주차, 품질이 ${ON_D}주차, 안전이 ${ON_C}주차에 [[차례로]] 터졌어요. 이 시차가 바로 [[대응 골든타임]]이었어요. 다음 현장에서는 공급사 이상 신호 하나로 네 사건을 미리 막을 수 있어요.`,
+    log:`결과 발현 시차 최대 ${Math.max(ON_A, ON_B, ON_C, ON_D) - ROOT_W}주 · 골든타임` },
+  { label:"종합 청구서", title:"하나의 원인, 하나의 패키지", meta:`손실 합산 · 통합 대응`, scan:"사건별 손실 합산 중", render:boardBill,
+    say:`하나의 원인이 남긴 청구서예요. 원가 초과, 지체상금, 품질 리스크를 합치면 [[${EXPOSURE_T.toFixed(1)}억]]이에요. 네 사건의 대책을 한 패키지로 묶으면 [[공기는 지키고, 손익은 흑자로 돌리고, 사고 위험은 줄일 수]] 있어요. 레미콘사에 청구할 근거도 네 사건의 증거로 한 번에 묶을 수 있어요.`,
+    log:`합산 노출액 ${EXPOSURE_T.toFixed(1)}억 · 통합 패키지` }
+];
+
 /* ======================== CONTROLLER ======================== */
 const CASES = {
   schedule: { no:"SFL-26-1115-A", sub:"공정 지연 수사", scenes:SCENES },
   cost:     { no:"SFL-26-1115-B", sub:"원가 초과 수사", scenes:SCENES_B },
   safety:   { no:"SFL-26-1115-C", sub:"안전 사고 수사", scenes:SCENES_C },
-  quality:  { no:"SFL-26-1115-D", sub:"품질 하자 수사", scenes:SCENES_D }
+  quality:  { no:"SFL-26-1115-D", sub:"품질 하자 수사", scenes:SCENES_D },
+  board:    { no:"SFL-26-1115", sub:"사건 종합 보드", scenes:SCENES_BOARD }
 };
 let caseId = "schedule", SC = SCENES;
 let cur = -1, typing = null, autoTimer = null, auto = false, busy = false;
-const visitedBy = { schedule:new Set(), cost:new Set(), safety:new Set(), quality:new Set() };
+const visitedBy = { schedule:new Set(), cost:new Set(), safety:new Set(), quality:new Set(), board:new Set() };
 const stepList = $("stepList");
 function buildSteps(){
+  stepList.style.gridTemplateColumns = `repeat(${SC.length},minmax(0,1fr))`;
   stepList.innerHTML = SC.map((s, i) => `<button class="step" type="button" data-i="${i}"><span class="n">${String(i + 1).padStart(2, "0")}</span><span class="l">${s.label}</span></button>`).join("");
 }
 stepList.addEventListener("click", e => { const b = e.target.closest(".step"); if (b) go(+b.dataset.i); });
@@ -2141,7 +2389,7 @@ function render(i){
   $("sceneStep").textContent = `STEP ${String(i + 1).padStart(2, "0")} / ${String(SC.length).padStart(2, "0")}`;
   $("sceneTitle").textContent = s.title;
   $("sceneMark").textContent = i + 1;
-  $("wm").textContent = { schedule:"A", cost:"B", safety:"C", quality:"D" }[caseId];
+  $("wm").textContent = { schedule:"A", cost:"B", safety:"C", quality:"D", board:"" }[caseId];
   $("sceneMeta").textContent = s.meta;
   body.scrollTop = 0;
   cleanup = s.render() || null;
